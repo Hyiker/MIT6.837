@@ -36,7 +36,7 @@ bool Sphere::intersect(const Ray &r, Hit &h, float tmin) {
     }
 
     float t_prime = sqrt(m_radius * m_radius - d2);
-    float t = origin_inside ? t_prime - tp : tp - t_prime;
+    float t = origin_inside ? t_prime + tp : tp - t_prime;
     // verify t >= tmin
     if (t < tmin) {
         return false;
