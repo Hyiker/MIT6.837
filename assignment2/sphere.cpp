@@ -1,5 +1,8 @@
+#include <cassert>
+#include <iostream>
+
 #include "object3d.h"
-#define ANALYTIC_SOLUTION
+// #define ANALYTIC_SOLUTION
 bool Sphere::intersect(const Ray &r, Hit &h, float tmin) {
     Vec3f ro = r.getOrigin() - m_center;
     Vec3f rd = r.getDirection();
@@ -12,20 +15,17 @@ bool Sphere::intersect(const Ray &r, Hit &h, float tmin) {
         return false;
     }
     float t0 = (-b - sqrt(delta)) / (2 * a), t1 = (-b + sqrt(delta)) / (2 * a);
-    float t = min(t0, t1);
-    if (t < tmin) {
+    if (t0 < 0 && t1 < 0) {
         return false;
     }
-    if (t < h.getT()) {
-        h.set(t, m_mat, r);
-    }
+    float t = t0 < 0 ? t1 : t0;
 #else
     // geometric solution
     bool origin_inside = ro.Length() < m_radius;
 
     float tp = -rd.Dot3(ro);
     if (tp < 0 && !origin_inside) {
-        tp = -tp;
+        return false;
     }
     float d2 = ro.Dot3(ro) - tp * tp;
     if (d2 > m_radius * m_radius) {
@@ -34,15 +34,18 @@ bool Sphere::intersect(const Ray &r, Hit &h, float tmin) {
 
     float t_prime = sqrt(m_radius * m_radius - d2);
     float t = origin_inside ? t_prime + tp : tp - t_prime;
-    // verify t >= tmin
+#endif
     if (t < tmin) {
         return false;
     }
+    // scene1_07 is probably wrong, right side sphere shouldn't be visible
     // update hit iff this t is smaller than the h.t
     if (t < h.getT()) {
-        h.set(t, m_mat, r);
+        Vec3f p = r.pointAtParameter(t);
+        Vec3f n = p - m_center;
+        n.Normalize();
+        h.set(t, m_mat, n, r);
+        return true;
     }
-#endif
-    // scene1_07 is probably wrong, right side sphere shouldn't be visible
-    return true;
+    return false;
 }
