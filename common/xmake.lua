@@ -6,6 +6,7 @@ target("common")
     add_defines("_CRT_SECURE_NO_WARNINGS")
     set_policy("build.warning", true)
     set_warnings("allextra")
+    add_linkdirs("libs")
     if is_plat("windows") then
         add_defines( "UNICODE", "_UNICODE")
         add_cxflags("/execution-charset:utf-8", "/source-charset:utf-8")
