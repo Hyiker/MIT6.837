@@ -1,5 +1,6 @@
-#ifndef ASSIGNMENT5_OBJECT3D_HPP
-#define ASSIGNMENT5_OBJECT3D_HPP
+#ifndef ASSIGNMENT6_OBJECT3D_HPP
+#define ASSIGNMENT6_OBJECT3D_HPP
+
 #include "boundingbox.h"
 #include "hit.h"
 #include "ray.h"
@@ -37,4 +38,4 @@ class Sphere : public Object3D {
     Vec3f m_center;
     float m_radius;
 };
-#endif /* ASSIGNMENT5_OBJECT3D_HPP */
+#endif /* ASSIGNMENT6_OBJECT3D_HPP */

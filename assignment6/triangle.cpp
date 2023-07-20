@@ -5,7 +5,9 @@
 #include "grid.h"
 #include "material.h"
 #include "matrix.h"
+#include "raytracing_stats.h"
 bool Triangle::intersect(const Ray &r, Hit &h, float tmin) {
+    RayTracingStats::IncrementNumIntersections();
     // compute intersection using barycentric coordinates
     Vec3f e1 = m_v[1] - m_v[0], e2 = m_v[2] - m_v[0], p;
     Vec3f::Cross3(p, r.getDirection(), e2);

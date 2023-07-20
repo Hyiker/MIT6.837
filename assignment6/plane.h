@@ -10,6 +10,7 @@ class Plane : public Object3D {
     ~Plane() override = default;
     bool intersect(const Ray &r, Hit &h, float tmin) override;
     void paint() const override;
+    void insertIntoGrid(Grid *g, Matrix *m) override;
 
    private:
     Vec3f m_normal;

@@ -84,10 +84,12 @@ class Grid : public Object3D {
     bool isInside(int i, int j, int k) const {
         return i >= 0 && i < m_nx && j >= 0 && j < m_ny && k >= 0 && k < m_nz;
     }
+    void addInfiniteObject(Object3D *obj) { m_infinite_objs.push_back(obj); }
 
    private:
     int m_nx, m_ny, m_nz;
     std::vector<Object3D *> m_cells;
+    std::vector<Object3D *> m_infinite_objs;
 };
 
 #endif /* ASSIGNMENT5_GRID_HPP */

@@ -87,3 +87,23 @@ void PhongMaterial::glSetMaterial(void) const {
 
 #endif
 }
+
+void Checkerboard::glSetMaterial(void) const { material1->glSetMaterial(); }
+Vec3f Checkerboard::Shade(const Ray &ray, const Hit &hit,
+                          const Vec3f &dirToLight,
+                          const Vec3f &lightColor) const {
+    // TODO
+    return Vec3f(0, 0, 0);
+}
+void Noise::glSetMaterial(void) const { material1->glSetMaterial(); }
+Vec3f Noise::Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
+                   const Vec3f &lightColor) const {
+    // TODO
+    return Vec3f(0, 0, 0);
+}
+void Marble::glSetMaterial(void) const { material1->glSetMaterial(); }
+Vec3f Marble::Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
+                    const Vec3f &lightColor) const {
+    // TODO
+    return Vec3f(0, 0, 0);
+}

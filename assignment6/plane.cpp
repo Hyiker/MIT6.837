@@ -3,8 +3,11 @@
 #include <glincludes.hpp>
 #include <iostream>
 
+#include "grid.h"
 #include "material.h"
+#include "raytracing_stats.h"
 bool Plane::intersect(const Ray &r, Hit &h, float tmin) {
+    RayTracingStats::IncrementNumIntersections();
     float t =
         -(m_d + m_normal.Dot3(r.getOrigin())) / m_normal.Dot3(r.getDirection());
     if (t >= tmin && t < h.getT()) {
@@ -43,3 +46,4 @@ void Plane::paint() const {
     glVertex3f(p4.x(), p4.y(), p4.z());
     glEnd();
 }
+void Plane::insertIntoGrid(Grid *g, Matrix *) { g->addInfiniteObject(this); }

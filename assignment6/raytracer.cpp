@@ -5,6 +5,7 @@
 #include "light.h"
 #include "material.h"
 #include "rayTree.h"
+#include "raytracing_stats.h"
 Vec3f reflect(const Vec3f& v, const Vec3f& n) { return v - 2 * v.Dot3(n) * n; }
 bool refract(const Vec3f& wi, const Vec3f& n, float eta, Vec3f* wt) {
     // Compute $\cos \theta_\roman{t}$ using Snell's law
@@ -29,10 +30,25 @@ RayTracer::RayTracer(SceneParser* s, int max_bounces, float cutoff_weight,
         s->getGroup()->insertIntoGrid(grid, nullptr);
     }
 }
+
+bool RayTracer::intersectScene(const Ray& r, Hit& h, float tmin) const {
+    return scene->getGroup()->intersect(r, h, tmin);
+}
+bool RayTracer::intersectSceneFast(const Ray& r, Hit& h, float tmin) const {
+    return scene->getGroup()->intersect(r, h, tmin);
+}
 Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
                           float indexOfRefraction, Hit& hit) const {
-    Object3D* target = getOptions().grid ? (Object3D*)grid : scene->getGroup();
-    bool intersected = target->intersect(ray, hit, tmin);
+    // count non-shadow ray
+    RayTracingStats::IncrementNumNonShadowRays();
+    bool intersected = false;
+    if (!grid)
+        intersected = intersectScene(ray, hit, tmin);
+    else if (!getOptions().visualize_grid)
+        intersected = intersectSceneFast(ray, hit, tmin);
+    else
+        intersected = grid->intersect(ray, hit, tmin);
+
     if (bounces > maxBounces || weight < cutoffWeight) return Vec3f(0, 0, 0);
     // only contribute background color when bounce <= maxBounces
     if (!intersected) {
@@ -65,7 +81,16 @@ Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
             Ray shadowRay(origin, wi);
             float tmax = distToLight;
             Hit shadowHit(tmax, nullptr, Vec3f(0, 0, 0));
-            bool shadowIntersected = target->intersect(shadowRay, shadowHit, 0);
+            // count shadow ray
+            RayTracingStats::IncrementNumShadowRays();
+            bool shadowIntersected = false;
+            if (!grid)
+                shadowIntersected = intersectScene(shadowRay, shadowHit, 0.0);
+            else if (!getOptions().visualize_grid)
+                shadowIntersected =
+                    intersectSceneFast(shadowRay, shadowHit, 0.0);
+            else
+                shadowIntersected = grid->intersect(shadowRay, shadowHit, 0.0);
             RayTree::AddShadowSegment(shadowRay, 0, shadowHit.getT());
             if (shadowIntersected) {
                 continue;

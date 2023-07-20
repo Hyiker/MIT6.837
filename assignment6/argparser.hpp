@@ -16,8 +16,9 @@ struct Options {
     bool shadows = false;
     int max_bounces = 0;
     float cutoff_weight = 0.0f;
-    bool grid = false;
+    bool visualize_grid = false;
     int grid_size[3];
+    bool stats = false;
 };
 void parse_args(int argc, const char **argv);
 const Options &getOptions();

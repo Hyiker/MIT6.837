@@ -11,6 +11,9 @@ class RayTracer {
               bool shadows, Grid* grid = nullptr);
     Vec3f traceRay(Ray& ray, float tmin, int bounces, float weight,
                    float indexOfRefraction, Hit& hit) const;
+    bool intersectScene(const Ray& r, Hit& h, float tmin) const;
+    bool intersectSceneFast(const Ray& r, Hit& h, float tmin) const;
+
     ~RayTracer() = default;
     Grid* getGrid() const { return grid; }
 

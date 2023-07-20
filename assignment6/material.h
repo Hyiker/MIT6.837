@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT4_MATERIAL_HPP
-#define ASSIGNMENT4_MATERIAL_HPP
+#ifndef ASSIGNMENT6_MATERIAL_HPP
+#define ASSIGNMENT6_MATERIAL_HPP
 
 #include "hit.h"
 #include "ray.h"
@@ -54,4 +54,69 @@ class PhongMaterial : public Material {
     float indexOfRefraction;
 };
 
-#endif /* ASSIGNMENT4_MATERIAL_HPP */
+class Checkerboard : public Material {
+   public:
+    Checkerboard(Matrix *m, Material *mat1, Material *mat2)
+        : Material(Vec3f(0, 0, 0)),
+          matrix(m),
+          material1(mat1),
+          material2(mat2) {}
+    ~Checkerboard() = default;
+    void glSetMaterial(void) const override;
+    Vec3f Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
+                const Vec3f &lightColor) const override;
+
+   protected:
+    Matrix *matrix;
+    Material *material1;
+    Material *material2;
+};
+class Noise : public Material {
+   public:
+    Noise(Matrix *m, Material *mat1, Material *mat2, int octaves)
+        : Material(Vec3f(0, 0, 0)),
+          matrix(m),
+          material1(mat1),
+          material2(mat2),
+          octaves(octaves) {}
+    ~Noise() = default;
+    void glSetMaterial(void) const override;
+    Vec3f Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
+                const Vec3f &lightColor) const override;
+
+   private:
+    Matrix *matrix;
+    Material *material1;
+    Material *material2;
+    int octaves;
+};
+
+class Marble : public Material {
+   public:
+    Marble(Matrix *m, Material *mat1, Material *mat2, int octaves,
+           float frequency, float amplitude)
+        : Material(Vec3f(0, 0, 0)),
+          matrix(m),
+          material1(mat1),
+          material2(mat2),
+          octaves(octaves),
+          frequency(frequency),
+          amplitude(amplitude) {}
+    ~Marble() = default;
+    void glSetMaterial(void) const override;
+    Vec3f Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
+                const Vec3f &lightColor) const override;
+
+   private:
+    Matrix *matrix;
+    Material *material1;
+    Material *material2;
+    int octaves;
+    float frequency;
+    float amplitude;
+};
+
+// TODO
+using Wood = Marble;
+
+#endif /* ASSIGNMENT6_MATERIAL_HPP */

@@ -3,6 +3,7 @@
 #include <glincludes.hpp>
 
 #include "rayTree.h"
+#include "raytracing_stats.h"
 void MarchingInfo::nextCell() {
     float t_next_min = std::min(t_next.x(), std::min(t_next.y(), t_next.z()));
     if (t_next_min == t_next.x()) {
@@ -96,6 +97,8 @@ bool Grid::intersect(const Ray &r, Hit &h, float tmin) {
         }
         RayTree::AddEnteredFace(face[0], face[1], face[2], face[3],
                                 faceNormals[ienter], boxm);
+        // count cell traversal
+        RayTracingStats::IncrementNumGridCellsTraversed();
         mi.nextCell();
     }
     return first;

@@ -8,10 +8,10 @@
 #include "group.h"
 #include "hit.h"
 #include "image.h"
-#include "light.h"
 #include "material.h"
 #include "ray.h"
 #include "raytracer.hpp"
+#include "raytracing_stats.h"
 #include "scene_parser.h"
 using namespace std;
 
@@ -52,6 +52,7 @@ void dispatch(const Options& opt, SceneParser& scene) {
         }
     }
     if (opt.output_file) color.SaveTGA(opt.output_file);
+    if (opt.stats) RayTracingStats::PrintStatistics();
     printf("Done.\n");
 }
 void dispatchWithoutArgs() { dispatch(getOptions(), *scenePtr); }
@@ -61,7 +62,7 @@ int main(int argc, const char** argv) {
     const Options& options = getOptions();
     scenePtr = new SceneParser(options.input_file);
     Grid* gridPtr = nullptr;
-    if (options.grid) {
+    if (options.visualize_grid) {
         assert(scenePtr->getGroup()->getBoundingBox() != nullptr);
         gridPtr = new Grid(scenePtr->getGroup()->getBoundingBox(),
                            options.grid_size[0], options.grid_size[1],
@@ -70,7 +71,10 @@ int main(int argc, const char** argv) {
     rayTracerPtr =
         new RayTracer(scenePtr, options.max_bounces, options.cutoff_weight,
                       options.shadows, gridPtr);
-    if (options.grid) {
+    RayTracingStats::Initialize(
+        options.width, options.height, scenePtr->getGroup()->getBoundingBox(),
+        options.grid_size[0], options.grid_size[1], options.grid_size[2]);
+    if (options.visualize_grid) {
         int s = 0;
         for (int i = 0; i < gridPtr->Volume(); i++) {
             s += gridPtr->getVoxelFlat(i) != nullptr;
@@ -81,7 +85,7 @@ int main(int argc, const char** argv) {
     if (options.gui) {
         GLCanvas canvas;
         canvas.initialize(scenePtr, dispatchWithoutArgs, traceRay, gridPtr,
-                          options.grid);
+                          options.visualize_grid);
     } else {
         dispatch(options, *scenePtr);
     }

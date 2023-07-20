@@ -65,7 +65,7 @@ void parse_args(int argc, const char **argv) {
             assert(i < argc);
             options.cutoff_weight = atof(argv[i]);
         } else if (!strcmp(argv[i], "-visualize_grid")) {
-            options.grid = true;
+            options.visualize_grid = true;
         } else if (!strcmp(argv[i], "-grid")) {
             i++;
             assert(i < argc);
@@ -76,6 +76,8 @@ void parse_args(int argc, const char **argv) {
             i++;
             assert(i < argc);
             options.grid_size[2] = atoi(argv[i]);
+        } else if (!strcmp(argv[i], "-stats")) {
+            options.stats = true;
         } else {
             printf("whoops error with command line argument %d: '%s'\n", i,
                    argv[i]);

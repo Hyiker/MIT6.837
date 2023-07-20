@@ -9,8 +9,10 @@
 #include "material.h"
 #include "matrix.h"
 #include "object3d.h"
+#include "raytracing_stats.h"
 #define ANALYTIC_SOLUTION
 bool Sphere::intersect(const Ray &r, Hit &h, float tmin) {
+    RayTracingStats::IncrementNumIntersections();
     Vec3f ro = r.getOrigin() - m_center;
     Vec3f rd = r.getDirection();
 #ifdef ANALYTIC_SOLUTION
