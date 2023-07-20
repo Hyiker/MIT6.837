@@ -113,7 +113,7 @@ Vec3f Sphere::getNormal(const Vec3f &point) const {
     n.Normalize();
     return n;
 }
-void Sphere::insertIntoGrid(Grid *g, Matrix *m) {
+void Sphere::insertIntoGrid(Grid *g, Matrix *m, Transform *t) {
     Vec3f center = m_center;
     float radius = m_radius;
     Vec3f radius3(radius, radius, radius);
@@ -136,7 +136,7 @@ void Sphere::insertIntoGrid(Grid *g, Matrix *m) {
                     if (vMin.x() <= bMax.x() && vMax.x() >= bMin.x() &&
                         vMin.y() <= bMax.y() && vMax.y() >= bMin.y() &&
                         vMin.z() <= bMax.z() && vMax.z() >= bMin.z()) {
-                        g->setVoxel(i, j, k, this);
+                        g->setVoxel(i, j, k, t ? (Object3D *)t : this);
                     }
                 } else {
                     Vec3f p = g->getVoxelCenter(i, j, k);
@@ -144,7 +144,7 @@ void Sphere::insertIntoGrid(Grid *g, Matrix *m) {
                     // use half_diag to detect even the slightest overlap at the
                     // corner
                     if (d <= radius + half_diag) {
-                        g->setVoxel(i, j, k, this);
+                        g->setVoxel(i, j, k, t ? (Object3D *)t : this);
                     }
                 }
             }

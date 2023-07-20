@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT2_TRIANGLE_HPP
-#define ASSIGNMENT2_TRIANGLE_HPP
+#ifndef ASSIGNMENT6_TRIANGLE_HPP
+#define ASSIGNMENT6_TRIANGLE_HPP
 #include "object3d.h"
 class Triangle : public Object3D {
    public:
@@ -14,9 +14,9 @@ class Triangle : public Object3D {
     ~Triangle() override = default;
     bool intersect(const Ray &r, Hit &h, float tmin) override;
     void paint() const override;
-    void insertIntoGrid(Grid *g, Matrix *m) override;
+    void insertIntoGrid(Grid *g, Matrix *m, Transform *t) override;
 
    private:
     Vec3f m_v[3];
 };
-#endif /* ASSIGNMENT2_TRIANGLE_HPP */
+#endif /* ASSIGNMENT6_TRIANGLE_HPP */

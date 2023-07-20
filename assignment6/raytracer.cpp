@@ -1,5 +1,7 @@
 #include "raytracer.hpp"
 
+#include <unordered_set>
+
 #include "argparser.hpp"
 #include "group.h"
 #include "light.h"
@@ -35,7 +37,56 @@ bool RayTracer::intersectScene(const Ray& r, Hit& h, float tmin) const {
     return scene->getGroup()->intersect(r, h, tmin);
 }
 bool RayTracer::intersectSceneFast(const Ray& r, Hit& h, float tmin) const {
-    return scene->getGroup()->intersect(r, h, tmin);
+    std::unordered_set<Object3D*> passBys;
+    // check infinite geometries first
+    bool hit_fb = grid->intersectInfiniteObjects(r, h, tmin);
+    MarchingInfo mi;
+    grid->initializeRayMarch(mi, r, tmin);
+    if (!mi.hit) return hit_fb;
+    int ilast{-1}, jlast{-1}, klast{-1};
+    while (grid->isInside(mi.i, mi.j, mi.k)) {
+        if (mi.i == ilast && mi.j == jlast && mi.k == klast) {
+            std::cerr << "infinite loop" << std::endl;
+            std::cout << mi.i << " " << mi.j << " " << mi.k << std::endl;
+            std::cout << mi.sign_x << " " << mi.sign_y << " " << mi.sign_z
+                      << std::endl;
+            std::cout << mi.t_next.x() << " " << mi.t_next.y() << " "
+                      << mi.t_next.z() << std::endl;
+            std::cout << mi.d_t.x() << " " << mi.d_t.y() << " " << mi.d_t.z()
+                      << std::endl;
+            std::cout << mi.tmin << std::endl;
+            exit(1);
+        }
+        ilast = mi.i;
+        jlast = mi.j;
+        klast = mi.k;
+        auto vec = grid->getVoxel(mi.i, mi.j, mi.k);
+        bool hit = false;
+        Vec3f vMin = grid->getVoxelMin(mi.i, mi.j, mi.k),
+              vMax = grid->getVoxelMax(mi.i, mi.j, mi.k);
+        for (auto obj : vec) {
+            if (passBys.count(obj)) continue;
+            RayTracingStats::IncrementNumIntersections();
+            bool hitThis = obj->intersect(r, h, tmin);
+            Vec3f hit_p = r.pointAtParameter(h.getT());
+            if (!hitThis) {
+                passBys.insert(obj);
+                continue;
+            }
+            // if hit point is not within the voxel cell, continue
+            bool isInsideVoxel =
+                hit_p.x() >= vMin.x() && hit_p.y() >= vMin.y() &&
+                hit_p.z() >= vMin.z() && hit_p.x() <= vMax.x() &&
+                hit_p.y() <= vMax.y() && hit_p.z() <= vMax.z();
+            if (isInsideVoxel) passBys.insert(obj);
+            hit_fb = true;
+            hit = isInsideVoxel || hit;
+        }
+        if (hit) return true;
+        RayTracingStats::IncrementNumGridCellsTraversed();
+        mi.nextCell();
+    }
+    return hit_fb;
 }
 Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
                           float indexOfRefraction, Hit& hit) const {

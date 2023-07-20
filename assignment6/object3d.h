@@ -5,6 +5,7 @@
 #include "hit.h"
 #include "ray.h"
 class Grid;
+class Transform;
 class Object3D {
    public:
     Object3D() = default;
@@ -13,7 +14,7 @@ class Object3D {
     virtual bool intersect(const Ray &r, Hit &h, float tmin) = 0;
     virtual void paint() const = 0;
     BoundingBox *getBoundingBox() const { return m_bb; }
-    virtual void insertIntoGrid(Grid *, Matrix *) {}
+    virtual void insertIntoGrid(Grid *, Matrix *, Transform * = nullptr) {}
     auto getMaterial() const { return m_mat; }
 
    protected:
@@ -32,7 +33,7 @@ class Sphere : public Object3D {
     void paint() const override;
     Vec3f getPoint(float theta, float phi) const;
     Vec3f getNormal(const Vec3f &point) const;
-    void insertIntoGrid(Grid *g, Matrix *m) override;
+    void insertIntoGrid(Grid *g, Matrix *m, Transform *t) override;
 
    private:
     Vec3f m_center;

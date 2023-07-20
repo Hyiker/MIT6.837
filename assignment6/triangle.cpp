@@ -53,7 +53,7 @@ void Triangle::paint() const {
     glVertex3f(m_v[2].x(), m_v[2].y(), m_v[2].z());
     glEnd();
 }
-void Triangle::insertIntoGrid(Grid *g, Matrix *m) {
+void Triangle::insertIntoGrid(Grid *g, Matrix *m, Transform *t) {
     // for now, simply test if the triangle's bounding box intersects the grid
     Vec3f bMin = m_bb->getMin(), bMax = m_bb->getMax();
     if (m) {
@@ -76,7 +76,7 @@ void Triangle::insertIntoGrid(Grid *g, Matrix *m) {
                 if (vMin.x() <= bMax.x() && vMax.x() >= bMin.x() &&
                     vMin.y() <= bMax.y() && vMax.y() >= bMin.y() &&
                     vMin.z() <= bMax.z() && vMax.z() >= bMin.z()) {
-                    g->setVoxel(i, j, k, this);
+                    g->setVoxel(i, j, k, t ? (Object3D *)t : this);
                 }
             }
         }

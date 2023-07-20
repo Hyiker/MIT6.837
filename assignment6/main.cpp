@@ -61,8 +61,9 @@ int main(int argc, const char** argv) {
     parse_args(argc, argv);
     const Options& options = getOptions();
     scenePtr = new SceneParser(options.input_file);
+    scenePtr->getGroup()->flatten();
     Grid* gridPtr = nullptr;
-    if (options.visualize_grid) {
+    if (options.grid_size[0]) {
         assert(scenePtr->getGroup()->getBoundingBox() != nullptr);
         gridPtr = new Grid(scenePtr->getGroup()->getBoundingBox(),
                            options.grid_size[0], options.grid_size[1],
@@ -77,7 +78,7 @@ int main(int argc, const char** argv) {
     if (options.visualize_grid) {
         int s = 0;
         for (int i = 0; i < gridPtr->Volume(); i++) {
-            s += gridPtr->getVoxelFlat(i) != nullptr;
+            s += !gridPtr->getVoxelFlat(i).empty();
         }
         std::cout << "Total number of objects in the grid: " << s << "/"
                   << gridPtr->Volume() << std::endl;

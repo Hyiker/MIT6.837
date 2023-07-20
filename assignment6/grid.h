@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT5_GRID_HPP
-#define ASSIGNMENT5_GRID_HPP
+#ifndef ASSIGNMENT6_GRID_HPP
+#define ASSIGNMENT6_GRID_HPP
 #include <vector>
 
 #include "object3d.h"
@@ -24,16 +24,13 @@ struct MarchingInfo {
 class Grid : public Object3D {
    public:
     Grid(BoundingBox *bb, int nx, int ny, int nz)
-        : Object3D(),
-          m_nx(nx),
-          m_ny(ny),
-          m_nz(nz),
-          m_cells(nx * ny * nz, nullptr) {
+        : Object3D(), m_nx(nx), m_ny(ny), m_nz(nz), m_cells(nx * ny * nz) {
         m_bb = bb;
     }
     ~Grid() override = default;
     void initializeRayMarch(MarchingInfo &mi, const Ray &r, float tmin) const;
     bool intersect(const Ray &r, Hit &h, float tmin) override;
+    bool intersectInfiniteObjects(const Ray &r, Hit &h, float tmin) const;
     void paint() const override;
     Vec3f getVoxelCenter(int i, int j, int k) const {
         float x = m_bb->getMin().x() +
@@ -65,7 +62,7 @@ class Grid : public Object3D {
     }
     auto getVoxelFlat(int i) const { return m_cells[i]; }
     void setVoxel(int i, int j, int k, Object3D *value) {
-        m_cells[i + m_nx * (j + m_ny * k)] = value;
+        m_cells[i + m_nx * (j + m_ny * k)].push_back(value);
     }
     Vec3f getVoxelSize() const {
         return Vec3f((m_bb->getMax().x() - m_bb->getMin().x()) / m_nx,
@@ -88,8 +85,8 @@ class Grid : public Object3D {
 
    private:
     int m_nx, m_ny, m_nz;
-    std::vector<Object3D *> m_cells;
+    std::vector<std::vector<Object3D *>> m_cells;
     std::vector<Object3D *> m_infinite_objs;
 };
 
-#endif /* ASSIGNMENT5_GRID_HPP */
+#endif /* ASSIGNMENT6_GRID_HPP */

@@ -1,5 +1,7 @@
 #ifndef ASSIGNMENT5_GROUP_HPP
 #define ASSIGNMENT5_GROUP_HPP
+#include <vector>
+
 #include "object3d.h"
 class Group : public Object3D {
    public:
@@ -19,7 +21,15 @@ class Group : public Object3D {
             m_bb->Extend(obj->getBoundingBox());
     }
     void paint() const override;
-    void insertIntoGrid(Grid *g, Matrix *m) override;
+    void insertIntoGrid(Grid *g, Matrix *m, Transform *t = nullptr) override;
+    std::vector<Object3D *> getObjects() const {
+        std::vector<Object3D *> objects;
+        for (int i = 0; i < m_num_objects; i++) {
+            objects.push_back(m_objects[i]);
+        }
+        return objects;
+    }
+    void flatten();
 
    private:
     int m_num_objects;

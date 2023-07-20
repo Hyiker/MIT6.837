@@ -46,4 +46,6 @@ void Plane::paint() const {
     glVertex3f(p4.x(), p4.y(), p4.z());
     glEnd();
 }
-void Plane::insertIntoGrid(Grid *g, Matrix *) { g->addInfiniteObject(this); }
+void Plane::insertIntoGrid(Grid *g, Matrix *, Transform *t) {
+    g->addInfiniteObject(t ? (Object3D *)t : this);
+}

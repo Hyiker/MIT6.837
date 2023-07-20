@@ -39,12 +39,15 @@ class Transform : public Object3D {
                 Vec3f::Max(max, vertices[i], max);
             }
             m_bb = new BoundingBox(min, max);
+            m_mat = obj->getMaterial();
         }
     }
     ~Transform() override = default;
     bool intersect(const Ray &r, Hit &h, float tmin) override;
     void paint() const override;
-    void insertIntoGrid(Grid *g, Matrix *m) override;
+    void insertIntoGrid(Grid *g, Matrix *m, Transform *t = nullptr) override;
+    Object3D *getObject() const { return m_object; }
+    Matrix getMatrix() const { return m_matrix; }
 
    private:
     Matrix m_matrix, m_matrix_inv;

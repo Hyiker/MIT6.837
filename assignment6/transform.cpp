@@ -1,5 +1,6 @@
 #include "transform.h"
 
+#include <cassert>
 #include <glincludes.hpp>
 #include <iostream>
 using namespace std;
@@ -35,12 +36,14 @@ void Transform::paint() const {
     m_object->paint();
     glPopMatrix();
 }
-void Transform::insertIntoGrid(Grid *g, Matrix *m) {
+void Transform::insertIntoGrid(Grid *g, Matrix *m, Transform *t) {
+    // scene is flattened, no nested transform
+    assert(t == nullptr);
     Matrix mat;
     if (m) {
         mat = *m * m_matrix;
     } else {
         mat = m_matrix;
     }
-    m_object->insertIntoGrid(g, &mat);
+    m_object->insertIntoGrid(g, &mat, this);
 }

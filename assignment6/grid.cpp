@@ -56,7 +56,8 @@ bool Grid::intersect(const Ray &r, Hit &h, float tmin) {
     while (isInside(mi.i, mi.j, mi.k)) {
         int i = mi.i, j = mi.j, k = mi.k;
         Material *m = nullptr;
-        if (auto obj = getVoxel(i, j, k); obj) {
+        if (auto vec = getVoxel(i, j, k); vec.size()) {
+            auto obj = vec[0];
             m = obj->getMaterial();
             if (!first) {
                 first = true;
@@ -103,6 +104,14 @@ bool Grid::intersect(const Ray &r, Hit &h, float tmin) {
     }
     return first;
 }
+bool Grid::intersectInfiniteObjects(const Ray &r, Hit &h, float tmin) const {
+    bool inter = false;
+    for (auto obj : m_infinite_objs) {
+        inter = obj->intersect(r, h, tmin) || inter;
+    }
+    return inter;
+}
+
 void Grid::initializeRayMarch(MarchingInfo &mi, const Ray &r,
                               float tmin) const {
     Vec3f offset = r.getOrigin() - m_bb->getMin();
@@ -144,6 +153,9 @@ void Grid::initializeRayMarch(MarchingInfo &mi, const Ray &r,
                      voxelSize.z() * (mi.k + (mi.sign_z == -1 ? 0 : 1)) -
                      r.getOrigin().z()) /
                     rd.z();
+    if (mi.sign_x == 0) mi.t_next.x() = std::numeric_limits<float>::infinity();
+    if (mi.sign_y == 0) mi.t_next.y() = std::numeric_limits<float>::infinity();
+    if (mi.sign_z == 0) mi.t_next.z() = std::numeric_limits<float>::infinity();
 }
 void Grid::paint() const {
     float delta_x_2 = (m_bb->getMax().x() - m_bb->getMin().x()) / m_nx / 2.0f,
@@ -153,7 +165,8 @@ void Grid::paint() const {
     for (int i = 0; i < m_nx; i++) {
         for (int j = 0; j < m_ny; j++) {
             for (int k = 0; k < m_nz; k++) {
-                if (auto o = getVoxel(i, j, k); o) {
+                if (auto v = getVoxel(i, j, k); v.size()) {
+                    auto o = v[0];
                     o->getMaterial()->glSetMaterial();
                     Vec3f center = getVoxelCenter(i, j, k);
                     float x = center.x();

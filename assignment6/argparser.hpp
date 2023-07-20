@@ -17,7 +17,7 @@ struct Options {
     int max_bounces = 0;
     float cutoff_weight = 0.0f;
     bool visualize_grid = false;
-    int grid_size[3];
+    int grid_size[3]{};
     bool stats = false;
 };
 void parse_args(int argc, const char **argv);
