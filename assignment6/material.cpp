@@ -3,7 +3,10 @@
 #include <glincludes.hpp>
 
 #include "argparser.hpp"
+#include "common.h"
 #include "glCanvas.h"
+#include "matrix.h"
+#include "perlin_noise.h"
 
 #ifdef SPECULAR_FIX
 // OPTIONAL:  global variable allows (hacky) communication
@@ -92,18 +95,60 @@ void Checkerboard::glSetMaterial(void) const { material1->glSetMaterial(); }
 Vec3f Checkerboard::Shade(const Ray &ray, const Hit &hit,
                           const Vec3f &dirToLight,
                           const Vec3f &lightColor) const {
-    // TODO
-    return Vec3f(0, 0, 0);
+    Vec3f pTS = hit.getIntersectionPoint();
+    matrix->Transform(pTS);
+    int x = (int)floor(pTS.x()), y = (int)floor(pTS.y()),
+        z = (int)floor(pTS.z());
+    if ((x + y + z) % 2 == 0) {
+        return material1->Shade(ray, hit, dirToLight, lightColor);
+    } else {
+        return material2->Shade(ray, hit, dirToLight, lightColor);
+    }
 }
 void Noise::glSetMaterial(void) const { material1->glSetMaterial(); }
+static float getNoiseRange(int octaves, float amplitude) {
+    double range = 0.0;
+    for (int k = 0; k < octaves; k++) {
+        range += sqrt(0.5) * amplitude / (1 << k);
+    }
+    return range;
+}
 Vec3f Noise::Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
                    const Vec3f &lightColor) const {
-    // TODO
-    return Vec3f(0, 0, 0);
+    Vec3f pTS = hit.getIntersectionPoint();
+    matrix->Transform(pTS);
+    int p = 1;
+    float noise = 0;
+    for (int i = 0; i < octaves; i++) {
+        Vec3f pTS2 = pTS * p;
+        noise += PerlinNoise::noise(pTS2.x(), pTS2.y(), pTS2.z()) / p;
+        p *= 2;
+    }
+    Vec3f c1 = material1->Shade(ray, hit, dirToLight, lightColor),
+          c2 = material2->Shade(ray, hit, dirToLight, lightColor);
+    // convert noise from [-0.707, 0.707] to [0, 1]
+    float range = getNoiseRange(octaves, 1.0);
+    noise = (noise + range) / (2 * range);
+    Vec3f color = (noise * c1 + (1 - noise) * c2);
+    // interpolate between c1 and c2 using noise
+    return color;
 }
 void Marble::glSetMaterial(void) const { material1->glSetMaterial(); }
 Vec3f Marble::Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
                     const Vec3f &lightColor) const {
-    // TODO
-    return Vec3f(0, 0, 0);
+    Vec3f pTS = hit.getIntersectionPoint();
+    matrix->Transform(pTS);
+    int p = 1;
+    float noise = 0;
+    for (int i = 0; i < octaves; i++) {
+        Vec3f pTS2 = pTS * p;
+        noise += PerlinNoise::noise(pTS2.x(), pTS2.y(), pTS2.z()) / p;
+        p *= 2;
+    }
+    noise = std::sin(frequency * pTS.x() + amplitude * noise);
+    noise = (noise + 1) / 2;
+    Vec3f c1 = material1->Shade(ray, hit, dirToLight, lightColor),
+          c2 = material2->Shade(ray, hit, dirToLight, lightColor);
+    // interpolate between c1 and c2 using noise
+    return c1 * noise + c2 * (1 - noise);
 }

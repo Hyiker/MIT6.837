@@ -32,7 +32,7 @@ bool Triangle::intersect(const Ray &r, Hit &h, float tmin) {
     float t = e2.Dot3(Q);
     float fInvA = 1.f / A;
     t *= fInvA;
-    if (t >= tmin && t < h.getT()) {
+    if (t >= tmin && t <= h.getT()) {
         Vec3f normal;
         Vec3f::Cross3(normal, e1, e2);
         normal.Normalize();

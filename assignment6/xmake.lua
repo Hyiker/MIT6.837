@@ -62,9 +62,9 @@ task("raytracer6_scene6")
         -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_11_mirrored_floor.txt -size 200 200 -output ".. imgs .."/output6_11b.tga -shadows -bounces 1 -weight 0.01 -grid 40 10 40 -stats")
         -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_11_mirrored_floor.txt -size 200 200 -output ".. imgs .."/output6_11c.tga -grid 40 10 40 -visualize_grid")
         
-        os.exec("xmake r raytracer6 -input ".. assets .."/scene6_12_faceted_gem.txt -size 200 200 -output ".. imgs .."/output6_12a.tga -shadows -shade_back -bounces 5 -weight 0.01 -stats")
-        os.exec("xmake r raytracer6 -input ".. assets .."/scene6_12_faceted_gem.txt -size 200 200 -output ".. imgs .."/output6_12b.tga -shadows -shade_back -bounces 5 -weight 0.01 -grid 20 20 20 -stats")
-        os.exec("xmake r raytracer6 -input ".. assets .."/scene6_12_faceted_gem.txt -size 200 200 -output ".. imgs .."/output6_12c.tga -grid 20 20 20 -visualize_grid")
+        -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_12_faceted_gem.txt -size 200 200 -output ".. imgs .."/output6_12a.tga -shadows -shade_back -bounces 5 -weight 0.01 -stats")
+        -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_12_faceted_gem.txt -size 200 200 -output ".. imgs .."/output6_12b.tga -shadows -shade_back -bounces 5 -weight 0.01 -grid 20 20 20 -stats")
+        -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_12_faceted_gem.txt -size 200 200 -output ".. imgs .."/output6_12c.tga -grid 20 20 20 -visualize_grid")
         
         -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_13_checkerboard.txt -size 200 200 -output ".. imgs .."/output6_13.tga -shadows")
         -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_14_glass_sphere.txt -size 200 200 -output ".. imgs .."/output6_14.tga -shadows -shade_back -bounces 5 -weight 0.01 -grid 20 20 20")
@@ -76,7 +76,7 @@ task("raytracer6_scene6")
         -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_17_marble_vase.txt -size 300 300 -output ".. imgs .."/output6_17b.tga -grid 15 30 15 -visualize_grid")
         -- -- UPDATE (11/2): this new image correctly handles procedural textures with a large ambient light contribution.
         
-        -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_18_6.837_logo.txt -size 400 200 -output ".. imgs .."/output6_18a.tga -shadows -shade_back -bounces 5 -weight 0.01 -grid 80 30 3")
-        -- os.exec("xmake r raytracer6 -input ".. assets .."/scene6_18_6.837_logo.txt -size 400 200 -output ".. imgs .."/output6_18b.tga -grid 80 30 3 -visualize_grid")
+        os.exec("xmake r raytracer6 -input ".. assets .."/scene6_18_6.837_logo.txt -size 400 200 -output ".. imgs .."/output6_18a.tga -shadows -shade_back -bounces 5 -weight 0.01 -grid 80 30 3")
+        os.exec("xmake r raytracer6 -input ".. assets .."/scene6_18_6.837_logo.txt -size 400 200 -output ".. imgs .."/output6_18b.tga -grid 80 30 3 -visualize_grid")
     end)
     set_menu {}

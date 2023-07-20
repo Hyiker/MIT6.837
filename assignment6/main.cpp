@@ -44,11 +44,17 @@ void traceRay(float u, float v) { traceRayWithColor(u, v); }
 void dispatch(const Options& opt, SceneParser& scene) {
     Image color(opt.width, opt.height);
     color.SetAllPixels(scene.getBackgroundColor());
-    for (int y = 0; y < opt.height; y++) {
-        for (int x = 0; x < opt.width; x++) {
-            color.SetPixel(x, y,
-                           traceRayWithColor((x + 0.5) / opt.width,
-                                             (y + 0.5) / opt.height));
+    int size_full = std::max(opt.width, opt.height);
+    int x_start = (size_full - opt.width) / 2, x_end = x_start + opt.width;
+    int y_start = (size_full - opt.height) / 2, y_end = y_start + opt.height;
+    // rendering full resolution, crop afterwards
+    for (int y = 0; y < size_full; y++) {
+        for (int x = 0; x < size_full; x++) {
+            if (x < x_start || x >= x_end || y < y_start || y >= y_end)
+                continue;
+            color.SetPixel(x - x_start, y - y_start,
+                           traceRayWithColor((x + 0.5) / size_full,
+                                             (y + 0.5) / size_full));
         }
     }
     if (opt.output_file) color.SaveTGA(opt.output_file);

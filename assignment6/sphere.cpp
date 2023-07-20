@@ -49,7 +49,7 @@ bool Sphere::intersect(const Ray &r, Hit &h, float tmin) {
     }
     // scene1_07 is probably wrong, right side sphere shouldn't be visible
     // update hit iff this t is smaller than the h.t
-    if (t < h.getT()) {
+    if (t <= h.getT()) {
         Vec3f p = r.pointAtParameter(t);
         Vec3f n = p - m_center;
         n.Normalize();

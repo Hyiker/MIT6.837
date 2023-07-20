@@ -1,5 +1,7 @@
 #include "raytracer.hpp"
 
+#include <corecrt_math.h>
+
 #include <unordered_set>
 
 #include "argparser.hpp"
@@ -115,7 +117,8 @@ Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
 
     // add ambient to make result happy
     Vec3f color{};
-    color += material->getDiffuseColor() * scene->getAmbientLight();
+    color +=
+        material->Shade(ray, hit, Vec3f(0, 1, 0), scene->getAmbientLight());
     Vec3f n = hit.getNormal();
     bool reverseNormal = ray.getDirection().Dot3(n) > 0;
     Vec3f n_ = reverseNormal ? -1.0f * n : n;
