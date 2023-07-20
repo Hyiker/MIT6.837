@@ -180,12 +180,23 @@ class Vec3f {
         assert(i >= 0 && i < 3);
         return data[i];
     }
+    float &operator[](int i) {
+        assert(i >= 0 && i < 3);
+        return data[i];
+    }
     float x() const { return data[0]; }
     float y() const { return data[1]; }
     float z() const { return data[2]; }
     float r() const { return data[0]; }
     float g() const { return data[1]; }
     float b() const { return data[2]; }
+
+    float &x() { return data[0]; }
+    float &y() { return data[1]; }
+    float &z() { return data[2]; }
+    float &r() { return data[0]; }
+    float &g() { return data[1]; }
+    float &b() { return data[2]; }
     float Length() const {
         float l = (float)sqrt(data[0] * data[0] + data[1] * data[1] +
                               data[2] * data[2]);
