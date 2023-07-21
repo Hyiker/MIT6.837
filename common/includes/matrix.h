@@ -54,6 +54,35 @@ class Matrix {
         assert(y >= 0 && y < 4);
         data[y][x] = v;
     }
+
+    float &At(int i, int j) {
+        assert(i >= 0 && i < 4);
+        assert(j >= 0 && j < 4);
+        return data[i][j];
+    }
+    void setRow(int i, const Vec4f &v) {
+        assert(i >= 0 && i < 4);
+        data[i][0] = v.x();
+        data[i][1] = v.y();
+        data[i][2] = v.z();
+        data[i][3] = v.w();
+    }
+    void setColumn(int i, const Vec4f &v) {
+        assert(i >= 0 && i < 4);
+        data[0][i] = v.x();
+        data[1][i] = v.y();
+        data[2][i] = v.z();
+        data[3][i] = v.w();
+    }
+    Vec4f getRow(int i) const {
+        assert(i >= 0 && i < 4);
+        return Vec4f(data[i][0], data[i][1], data[i][2], data[i][3]);
+    }
+    Vec4f getColumn(int i) const {
+        assert(i >= 0 && i < 4);
+        return Vec4f(data[0][i], data[1][i], data[2][i], data[3][i]);
+    }
+
     void SetToIdentity();
     void Clear();
 
@@ -125,6 +154,14 @@ class Matrix {
     void Write3x3(FILE *F = stdout) const;
     void Read(FILE *F);
     void Read3x3(FILE *F);
+
+    static float det4x4(float a1, float a2, float a3, float a4, float b1,
+                        float b2, float b3, float b4, float c1, float c2,
+                        float c3, float c4, float d1, float d2, float d3,
+                        float d4);
+    static float det3x3(float a1, float a2, float a3, float b1, float b2,
+                        float b3, float c1, float c2, float c3);
+    static float det2x2(float a, float b, float c, float d);
 
    private:
     // REPRESENTATION

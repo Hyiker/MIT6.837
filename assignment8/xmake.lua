@@ -1,0 +1,82 @@
+add_requires("opengl", "glu")
+target("raytracer8")
+    set_kind("binary")
+    add_deps("common")
+    add_packages("opengl", "glu")
+
+    add_files("*.cpp", {includedirs="."})
+    set_policy("build.warning", true)
+    set_warnings("allextra")
+    set_languages("c17", "cxx20")
+    add_defines("_USE_MATH_DEFINES", "_HAS_STD_BYTE=0", "NOMINMAX")
+
+target("curve_editor8")
+    set_kind("binary")
+    add_deps("common")
+    add_packages("opengl", "glu")
+
+    add_files("spline/*.cpp", {includedirs="spline"})
+    set_policy("build.warning", true)
+    set_warnings("allextra")
+    set_languages("c17", "cxx20")
+    add_defines("_USE_MATH_DEFINES", "_HAS_STD_BYTE=0", "NOMINMAX")
+
+task("raytracer8_scene8")
+    set_category("plugin")
+    on_run(function ()
+        os.exec("xmake f -m release -c")
+        os.exec("xmake build raytracer8")
+        os.exec("xmake build curve_editor8")
+
+        local assets = path.join(os.scriptdir(), "assets")
+        local imgs = path.join(os.scriptdir(), "imgs")
+        
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_01_bezier.txt -gui -curve_tessellation 30")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_02_bspline.txt -gui -curve_tessellation 30")
+        
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_01_bezier.txt -output_bezier ".. imgs .."/output8_01_bezier.txt")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_01_bezier.txt -output_bspline ".. imgs .."/output8_01_bspline.txt")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_02_bspline.txt -output_bezier ".. imgs .."/output8_02_bezier.txt")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_02_bspline.txt -output_bspline ".. imgs .."/output8_02_bspline.txt")
+        -- os.exec("xmake r curve_editor8 -input ".. imgs .."/output8_01_bezier.txt -gui -curve_tessellation 30")
+        -- os.exec("xmake r curve_editor8 -input ".. imgs .."/output8_01_bspline.txt -gui -curve_tessellation 30")
+        -- os.exec("xmake r curve_editor8 -input ".. imgs .."/output8_02_bezier.txt -gui -curve_tessellation 30")
+        -- os.exec("xmake r curve_editor8 -input ".. imgs .."/output8_02_bspline.txt -gui -curve_tessellation 30")
+        
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_03_bezier.txt -gui -curve_tessellation 30")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_04_bspline.txt -gui -curve_tessellation 30")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_05_bspline_dups.txt -gui -curve_tessellation 30")
+        
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_06_torus.txt -curve_tessellation 4 -gui")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_06_torus.txt -curve_tessellation 4 -revolution_tessellation 10 -output ".. assets .."/torus_low.obj")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_06_torus.txt -curve_tessellation 30 -revolution_tessellation 60 -output ".. assets .."/torus_high.obj")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_06_torus_low.txt -gui -size 300 300")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_06_torus_high.txt -gui -size 300 300")
+        
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_07_vase.txt -curve_tessellation 4 -output_bspline ".. assets .."/output8_07_edit.txt -gui")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/output8_07_edit.txt -curve_tessellation 4 -revolution_tessellation 10 -output ".. assets .."/vase_low.obj")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/output8_07_edit.txt -curve_tessellation 10 -revolution_tessellation 60 -output ".. assets .."/vase_high.obj")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_07_vase_low.txt -gui -size 300 300")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_07_vase_high.txt -gui -size 300 300")
+        
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_08_bezier_patch.txt -gui")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_08_bezier_patch.txt -patch_tessellation 4 -output ".. assets .."/patch_low.obj")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_08_bezier_patch.txt -patch_tessellation 10 -output ".. assets .."/patch_med.obj")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_08_bezier_patch.txt -patch_tessellation 40 -output ".. assets .."/patch_high.obj")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_08_bezier_patch_low.txt -gui -size 300 300")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_08_bezier_patch_med.txt -gui -size 300 300")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_08_bezier_patch_high.txt -gui -size 300 300")
+        
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_09_teapot.txt -curve_tessellation 4 -gui")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_09_teapot.txt -patch_tessellation 4 -curve_tessellation 4 -revolution_tessellation 10 -output ".. assets .."/teapot_low.obj")
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/spline8_09_teapot.txt -patch_tessellation 30 -curve_tessellation 30 -revolution_tessellation 100 -output ".. assets .."/teapot_high.obj")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_09_teapot_low.txt -gui -size 300 300")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_09_teapot_high.txt -gui -size 300 300")
+        
+        -- os.exec("xmake r curve_editor8 -input ".. assets .."/output8_07_edit.txt -curve_tessellation 20 -revolution_tessellation 100 -output ".. assets .."/vase_very_high.obj")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_10_transparent_vase.txt -output ".. imgs .."/output8_10.tga -grid 30 30 30 -size 300 300 -bounces 4 -shade_back -jittered_samples 9 -tent_filter 1.0 -shadows")
+        os.exec("xmake r raytracer8 -input ".. assets .."/scene8_11_reflective_teapot.txt -output ".. imgs .."/output8_11.tga -grid 50 30 30 -size 300 300 -bounces 4 -shade_back -jittered_samples 9 -tent_filter 1.0 -shadows")
+        -- os.exec("xmake r raytracer8 -input ".. assets .."/scene8_10_transparent_vase.txt -output ".. imgs .."/output8_10.tga -grid 30 30 30 -size 60 60 -bounces 4 -shade_back -tent_filter 1.0 -shadows")
+
+    end)
+    set_menu{}
