@@ -34,7 +34,7 @@ float BoxFilter::getWeight(float x, float y) {
 float TentFilter::getWeight(float x, float y) {
     float d = std::sqrt(x * x + y * y);
     // move x and y to the center of the pixel
-    return 1.f - d / m_radius;
+    return std::max(0.f, 1.f - d / m_radius);
 }
 float GaussianFilter::getWeight(float x, float y) {
     // move x and y to the center of the pixel
