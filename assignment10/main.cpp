@@ -86,7 +86,9 @@ void dispatch(const Options& opt) {
     if (opt.stats) RayTracingStats::PrintStatistics();
     printf("Done.\n");
 }
+
 void dispatchWithoutArgs() { dispatch(getOptions()); }
+
 void initSampler(const Options& opt) {
     if (opt.uniform_samples)
         samplerPtr = new UniformSampler(opt.uniform_samples);
@@ -98,6 +100,7 @@ void initSampler(const Options& opt) {
         // fallback to 1 spp uniform sampler: (0.5, 0.5)
         samplerPtr = new UniformSampler(1);
 }
+
 void initFilter(const Options& opt) {
     if (opt.box_filter_radius >= 0)
         filterPtr = new BoxFilter(opt.box_filter_radius);
@@ -109,6 +112,7 @@ void initFilter(const Options& opt) {
         // fallback to box filter
         filterPtr = new BoxFilter(0.01);
 }
+
 int main(int argc, const char** argv) {
     glutInit(&argc, (char**)argv);
     parse_args(argc, argv);
