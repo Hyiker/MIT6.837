@@ -80,3 +80,16 @@ void Film::renderFilter(char *filter_file, int filter_zoom, Filter *filter) {
     // save the image
     image.SaveTGA(filter_file);
 }
+void Film::saveImage(const char *filename) {
+    // create an image
+    Image image = Image(width, height);
+
+    // loop over the pixels of the image
+    for (int i = 0; i < width; i++) {
+        for (int j = 0; j < height; j++)
+            image.SetPixel(i, j, m_filter->getColor(i, j, this));
+    }
+
+    // save the image
+    image.SaveTGA(filename);
+}

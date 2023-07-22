@@ -1,6 +1,7 @@
-#ifndef ASSIGNMENT7_MATERIAL_HPP
-#define ASSIGNMENT7_MATERIAL_HPP
+#ifndef ASSIGNMENT_10_INCLUDE_MATERIAL_HPP
+#define ASSIGNMENT_10_INCLUDE_MATERIAL_HPP
 
+#include "brdf.hpp"
 #include "hit.h"
 #include "ray.h"
 #include "vectors.h"
@@ -125,7 +126,33 @@ class Marble : public Material {
     float amplitude;
 };
 
-// TODO
 using Wood = Marble;
+class PBRMaterial : public Material {
+   public:
+    using Material::Material;
+    virtual std::unique_ptr<BRDF> getBRDF(const Hit &hit) const = 0;
+};
+class UberMaterial : public PBRMaterial {
+   public:
+    UberMaterial(const Vec3f &baseColor, float subsurface, float metallic,
+                 float specular, float roughness)
+        : PBRMaterial(baseColor),
+          baseColor(baseColor),
+          subsurface(subsurface),
+          metallic(metallic),
+          specular(specular),
+          roughness(roughness) {}
 
-#endif /* ASSIGNMENT7_MATERIAL_HPP */
+    Vec3f Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
+                const Vec3f &lightColor) const override;
+    std::unique_ptr<BRDF> getBRDF(const Hit &hit) const override;
+    void glSetMaterial(void) const override;
+
+    Vec3f baseColor;
+    float subsurface;
+    float metallic;
+    float specular;
+    float roughness;
+};
+
+#endif /* ASSIGNMENT_10_INCLUDE_MATERIAL_HPP */

@@ -14,7 +14,7 @@ struct Options {
     bool gouraud = false;
     int tessellation[2]{100, 100};
     bool shadows = false;
-    int max_bounces = 0;
+    int max_bounces = 10;
     float cutoff_weight = 0.0f;
     bool visualize_grid = false;
     int grid_size[3]{};

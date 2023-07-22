@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "film.h"
 #include "sample.h"
 Vec3f Filter::getColor(int i, int j, Film *film) {
     Vec3f result(0, 0, 0);
@@ -43,4 +44,14 @@ float GaussianFilter::getWeight(float x, float y) {
     //     return 0.f;
     // }
     return exp(-d2 / (2 * m_sigma * m_sigma));
+}
+std::unique_ptr<Filter> createFilter(const Options &opt) {
+    if (opt.box_filter_radius >= 0)
+        return std::make_unique<BoxFilter>(opt.box_filter_radius);
+    else if (opt.tent_filter_radius >= 0)
+        return std::make_unique<TentFilter>(opt.tent_filter_radius);
+    else if (opt.gaussian_filter_sigma >= 0)
+        return std::make_unique<GaussianFilter>(opt.gaussian_filter_sigma);
+    else
+        return std::make_unique<BoxFilter>(0.01f);
 }

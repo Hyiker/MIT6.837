@@ -254,6 +254,8 @@ void SceneParser::parseMaterials() {
             materials[count] = parseMarble(count);
         } else if (!strcmp(token, "Wood")) {
             materials[count] = parseWood(count);
+        } else if (!strcmp(token, "UberMaterial")) {
+            materials[count] = parseUber(count);
         } else {
             printf("Unknown token in parseMaterial: '%s'\n", token);
             exit(0);
@@ -428,6 +430,36 @@ Material *SceneParser::parseWood(int count) {
     assert(!strcmp(token, "}"));
     return new Wood(matrix, materials[m1], materials[m2], octaves, frequency,
                     amplitude);
+}
+Material *SceneParser::parseUber(int count) {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    Vec3f baseColor(1, 1, 1);
+    float subsurface = 0;
+    float metallic = 0.5;
+    float specular = 0.5;
+    float roughness = 0.0;
+    getToken(token);
+    assert(!strcmp(token, "{"));
+    while (1) {
+        getToken(token);
+        if (!strcmp(token, "baseColor")) {
+            baseColor = readVec3f();
+        } else if (!strcmp(token, "subsurface")) {
+            subsurface = readFloat();
+        } else if (!strcmp(token, "metallic")) {
+            metallic = readFloat();
+        } else if (!strcmp(token, "specular")) {
+            specular = readFloat();
+        } else if (!strcmp(token, "roughness")) {
+            roughness = readFloat();
+        } else {
+            assert(!strcmp(token, "}"));
+            break;
+        }
+    }
+    Material *answer =
+        new UberMaterial(baseColor, subsurface, metallic, specular, roughness);
+    return answer;
 }
 
 // ====================================================================

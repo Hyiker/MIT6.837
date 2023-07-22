@@ -2,9 +2,11 @@
 
 #include <corecrt_math.h>
 
+#include <memory>
 #include <unordered_set>
 
 #include "argparser.hpp"
+#include "camera.h"
 #include "group.h"
 #include "light.h"
 #include "material.h"
@@ -23,89 +25,55 @@ bool refract(const Vec3f& wi, const Vec3f& n, float eta, Vec3f* wt) {
     *wt = -1.0f * eta * wi + (eta * cosThetaI - cosThetaT) * Vec3f(n);
     return true;
 }
-RayTracer::RayTracer(SceneParser* s, int max_bounces, float cutoff_weight,
-                     bool shadows, Grid* grid)
-    : scene(s),
-      maxBounces(max_bounces),
-      cutoffWeight(cutoff_weight),
-      shadows(shadows),
-      grid(grid) {
-    if (grid) {
-        s->getGroup()->insertIntoGrid(grid, nullptr);
-    }
-}
-
-bool RayTracer::intersectScene(const Ray& r, Hit& h, float tmin) const {
-    return scene->getGroup()->intersect(r, h, tmin);
-}
-bool RayTracer::intersectSceneFast(const Ray& r, Hit& h, float tmin) const {
-    std::unordered_set<Object3D*> passBys;
-    // check infinite geometries first
-    bool hit_fb = grid->intersectInfiniteObjects(r, h, tmin);
-    MarchingInfo mi;
-    grid->initializeRayMarch(mi, r, tmin);
-    if (!mi.hit) return hit_fb;
-    int ilast{-1}, jlast{-1}, klast{-1};
-    while (grid->isInside(mi.i, mi.j, mi.k)) {
-        if (mi.i == ilast && mi.j == jlast && mi.k == klast) {
-            std::cerr << "infinite loop" << std::endl;
-            std::cout << mi.i << " " << mi.j << " " << mi.k << std::endl;
-            std::cout << mi.sign_x << " " << mi.sign_y << " " << mi.sign_z
-                      << std::endl;
-            std::cout << mi.t_next.x() << " " << mi.t_next.y() << " "
-                      << mi.t_next.z() << std::endl;
-            std::cout << mi.d_t.x() << " " << mi.d_t.y() << " " << mi.d_t.z()
-                      << std::endl;
-            std::cout << mi.tmin << std::endl;
-            exit(1);
-        }
-        ilast = mi.i;
-        jlast = mi.j;
-        klast = mi.k;
-        auto vec = grid->getVoxel(mi.i, mi.j, mi.k);
-        bool hit = false;
-        Vec3f vMin = grid->getVoxelMin(mi.i, mi.j, mi.k),
-              vMax = grid->getVoxelMax(mi.i, mi.j, mi.k);
-        for (auto obj : vec) {
-            if (passBys.count(obj)) continue;
-            RayTracingStats::IncrementNumIntersections();
-            bool hitThis = obj->intersect(r, h, tmin);
-            Vec3f hit_p = r.pointAtParameter(h.getT());
-            if (!hitThis) {
-                passBys.insert(obj);
-                continue;
+RayTracer::RayTracer(std::unique_ptr<Scene> scene,
+                     std::unique_ptr<Integrator> integrator,
+                     std::unique_ptr<Sampler> pixelSampler, float cutOffWeight)
+    : m_integrator(std::move(integrator)),
+      m_scene(std::move(scene)),
+      m_pixel_sampler(std::move(pixelSampler)),
+      cutOffWeight(cutOffWeight) {}
+void RayTracer::render(Film& film) {
+    assert(samplerPtr != nullptr);
+    // rendering full resolution, crop afterwards
+    for (int y = 0; y < film.getWidth(); y++) {
+        for (int x = 0; x < film.getHeight(); x++) {
+            std::unique_ptr<GlobalSampler> sampler =
+                m_integrator->getSampler(x * film.getHeight() + y);
+            // generate one sampler for each pixel
+            for (int i = 0; i < m_pixel_sampler->getSpp(); i++) {
+                Vec2f uv = m_pixel_sampler->getSamplePosition(i);
+                Ray ray = generateRay(Vec2f((x + uv.x()) / film.getWidth(),
+                                            (y + uv.y()) / film.getHeight()));
+                film.setSample(x, y, i, uv,
+                               m_integrator->L(*m_scene, *sampler, ray));
+                // Hit hit;
+                // hit.set(INFINITY, nullptr, Vec3f(), ray);
+                // film.setSample(
+                //     x, y, i, uv,
+                //     traceRayRadiosity(ray, getTMin(), 0, 1.0, 1.0, hit));
             }
-            // if hit point is not within the voxel cell, continue
-            bool isInsideVoxel =
-                hit_p.x() >= vMin.x() && hit_p.y() >= vMin.y() &&
-                hit_p.z() >= vMin.z() && hit_p.x() <= vMax.x() &&
-                hit_p.y() <= vMax.y() && hit_p.z() <= vMax.z();
-            if (isInsideVoxel) passBys.insert(obj);
-            hit_fb = true;
-            hit = isInsideVoxel || hit;
         }
-        if (hit) return true;
-        RayTracingStats::IncrementNumGridCellsTraversed();
-        mi.nextCell();
     }
-    return hit_fb;
 }
-Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
-                          float indexOfRefraction, Hit& hit) const {
+Ray RayTracer::generateRay(const Vec2f& uv) const {
+    Camera* camera = m_scene->getCamera();
+    return camera->generateRay(uv);
+}
+float RayTracer::getTMin() const { return m_scene->getCamera()->getTMin(); }
+Vec3f RayTracer::traceRayRadiosity(Ray& ray, float tmin, int bounces,
+                                   float weight, float indexOfRefraction,
+                                   Hit& hit) const {
+    Options opt = getOptions();
     // count non-shadow ray
     RayTracingStats::IncrementNumNonShadowRays();
     bool intersected = false;
-    if (!grid)
-        intersected = intersectScene(ray, hit, tmin);
-    else if (!getOptions().visualize_grid)
-        intersected = intersectSceneFast(ray, hit, tmin);
-    else
-        intersected = grid->intersect(ray, hit, tmin);
+    intersected = m_scene->intersect(ray, hit, tmin);
 
-    if (bounces > maxBounces || weight < cutoffWeight) return Vec3f(0, 0, 0);
+    if (bounces > m_integrator->getMaxBounces() || weight < cutOffWeight)
+        return Vec3f(0, 0, 0);
     // only contribute background color when bounce <= maxBounces
     if (!intersected) {
-        return scene->getBackgroundColor();
+        return m_scene->getBackgroundColor();
     }
     if (bounces == 0) RayTree::SetMainSegment(ray, 0, hit.getT());
     Material* material = hit.getMaterial();
@@ -118,19 +86,19 @@ Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
     // add ambient to make result happy
     Vec3f color{};
     color += material->ShadeAmbient(hit.getIntersectionPoint(),
-                                    scene->getAmbientLight());
+                                    m_scene->getAmbientLight());
     Vec3f n = hit.getNormal();
     bool reverseNormal = ray.getDirection().Dot3(n) > 0;
     Vec3f n_ = reverseNormal ? -1.0f * n : n;
 
     Vec3f hit_p = ray.pointAtParameter(hit.getT());
-    for (int i = 0; i < scene->getNumLights(); i++) {
-        Light* light = scene->getLight(i);
+    for (int i = 0; i < m_scene->getNumLights(); i++) {
+        Light* light = m_scene->getLight(i);
         Vec3f wi, col;
         float distToLight;
         light->getIllumination(hit_p, wi, col, distToLight);
         // test light visibility
-        if (shadows) {
+        if (opt.shadows) {
             Vec3f origin = hit_p + 1e-4 * n_;
             Ray shadowRay(origin, wi);
             float tmax = distToLight;
@@ -138,13 +106,7 @@ Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
             // count shadow ray
             RayTracingStats::IncrementNumShadowRays();
             bool shadowIntersected = false;
-            if (!grid)
-                shadowIntersected = intersectScene(shadowRay, shadowHit, 0.0);
-            else if (!getOptions().visualize_grid)
-                shadowIntersected =
-                    intersectSceneFast(shadowRay, shadowHit, 0.0);
-            else
-                shadowIntersected = grid->intersect(shadowRay, shadowHit, 0.0);
+            shadowIntersected = m_scene->intersect(shadowRay, shadowHit, tmin);
             RayTree::AddShadowSegment(shadowRay, 0, shadowHit.getT());
             if (shadowIntersected) {
                 continue;
@@ -162,10 +124,10 @@ Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
             Vec3f origin = hit_p + 1e-4 * n_;
             Ray reflectRay(origin, wi);
             Hit reflectHit(INFINITY, nullptr, Vec3f(0, 0, 0));
-            Vec3f reflectColor =
-                traceRay(reflectRay, 0.0, bounces + 1,
-                         weight * phongMaterial->getReflectiveColor().Length(),
-                         indexOfRefraction, reflectHit);
+            Vec3f reflectColor = traceRayRadiosity(
+                reflectRay, 0.0, bounces + 1,
+                weight * phongMaterial->getReflectiveColor().Length(),
+                indexOfRefraction, reflectHit);
             RayTree::AddReflectedSegment(reflectRay, 0.0, reflectHit.getT());
             color += phongMaterial->getReflectiveColor() * reflectColor;
         }
@@ -182,7 +144,7 @@ Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
                 Ray refractRay(origin, wt);
                 Hit refractHit(INFINITY, nullptr, Vec3f(0, 0, 0));
 
-                Vec3f refractColor = traceRay(
+                Vec3f refractColor = traceRayRadiosity(
                     refractRay, 0, bounces + 1,
                     weight * phongMaterial->getTransparentColor().Length(),
                     entering ? phongMaterial->getIndexOfRefraction() : 1.0,

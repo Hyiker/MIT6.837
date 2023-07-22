@@ -1,7 +1,10 @@
 #ifndef ASSIGNMENT7_FILTER_HPP
 #define ASSIGNMENT7_FILTER_HPP
-#include "film.h"
+#include <memory>
+
+#include "argparser.hpp"
 #include "vectors.h"
+class Film;
 class Filter {
    public:
     Filter() = default;
@@ -38,4 +41,6 @@ class GaussianFilter : public Filter {
    private:
     float m_sigma;
 };
+
+std::unique_ptr<Filter> createFilter(const Options &opt);
 #endif /* ASSIGNMENT7_FILTER_HPP */

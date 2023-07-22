@@ -1,0 +1,53 @@
+
+PerspectiveCamera {
+    center 0 6 20
+    direction 0 -2 -20
+    up 0 1 0
+    angle 30
+}
+
+Lights {
+    numLights 2
+    DirectionalLight {
+        direction -0.7 -0.8 -1
+        color 0.5 0.5 0.5
+    }
+
+    DirectionalLight {
+        direction 0.5 -0.8 -0.7
+        color 0.5 0.5 0.5
+    }
+}
+
+Background {
+    color 0.4 0.2 0.8
+    ambientLight 0.5 0.5 0.5
+}
+
+Materials {
+    numMaterials 2
+    PhongMaterial {
+        diffuseColor 0.1 0.2 0.1
+	specularColor 0 0 0
+    }
+    PhongMaterial {
+        diffuseColor 0.3 0.3 0.3
+	specularColor 0 0 0
+    }
+}
+
+Group {
+    numObjects 2
+
+    MaterialIndex 0
+    TriangleMesh {
+        obj_file vase.obj
+    }
+
+    MaterialIndex 1
+    Plane {
+	normal 0 1 0
+        offset -0.02
+    }
+}
+

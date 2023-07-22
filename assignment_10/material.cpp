@@ -1,6 +1,7 @@
 #include "material.h"
 
 #include <glincludes.hpp>
+#include <memory>
 
 #include "argparser.hpp"
 #include "common.h"
@@ -202,4 +203,73 @@ Vec3f Marble::ShadeAmbient(const Vec3f &pWS, const Vec3f &lightColor) const {
           c2 = material2->ShadeAmbient(pWS, lightColor);
     // interpolate between c1 and c2 using noise
     return c1 * noise + c2 * (1 - noise);
+}
+
+Vec3f UberMaterial::Shade(const Ray &ray, const Hit &hit,
+                          const Vec3f &dirToLight,
+                          const Vec3f &lightColor) const {
+    Vec3f n = hit.getNormal();
+    Vec3f wi = dirToLight;
+    Vec3f wo = ray.getDirection();
+    wo.Negate();
+    Vec3f h = wi + wo;
+    h.Normalize();
+    if (getOptions().shade_back) {
+        n = faceforward(n, wo);
+    }
+    float cosTheta = max(0.f, n.Dot3(wi));
+    float NdotH = max(0.f, n.Dot3(h));
+    Vec3f diffuse = cosTheta * diffuseColor;
+    return (diffuse)*lightColor;
+}
+void UberMaterial::glSetMaterial(void) const {
+    GLfloat one[4] = {1.0, 1.0, 1.0, 1.0};
+    GLfloat zero[4] = {0.0, 0.0, 0.0, 0.0};
+    GLfloat specular[4] = {0.0, 0.0, 0.0, 1.0};
+    GLfloat diffuse[4] = {getDiffuseColor().r(), getDiffuseColor().g(),
+                          getDiffuseColor().b(), 1.0};
+
+    // NOTE: GL uses the Blinn Torrance version of Phong...
+    float glexponent = 1.0;
+    if (glexponent < 0) glexponent = 0;
+    if (glexponent > 128) glexponent = 128;
+
+#if !SPECULAR_FIX
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, diffuse);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, &glexponent);
+
+#else
+
+    // OPTIONAL: 3 pass rendering to fix the specular highlight
+    // artifact for small specular exponents (wide specular lobe)
+
+    if (SPECULAR_FIX_WHICH_PASS == 0) {
+        // First pass, draw only the specular highlights
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, zero);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, zero);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, &glexponent);
+
+    } else if (SPECULAR_FIX_WHICH_PASS == 1) {
+        // Second pass, compute normal dot light
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, one);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, zero);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, zero);
+    } else {
+        // Third pass, add ambient & diffuse terms
+        assert(SPECULAR_FIX_WHICH_PASS == 2);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, diffuse);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, zero);
+    }
+
+#endif
+}
+
+std::unique_ptr<BRDF> UberMaterial::getBRDF(const Hit &hit) const {
+    return std::make_unique<PrincipledBRDF>(hit, diffuseColor, subsurface,
+                                            metallic, specular, roughness);
 }

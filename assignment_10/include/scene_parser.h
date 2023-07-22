@@ -59,6 +59,7 @@ class SceneParser {
     Material* parseNoise(int count);
     Material* parseMarble(int count);
     Material* parseWood(int count);
+    Material* parseUber(int count);
 
     Object3D* parseObject(char token[MAX_PARSER_TOKEN_LENGTH]);
     Group* parseGroup();

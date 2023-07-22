@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT5_HIT_HPP
-#define ASSIGNMENT5_HIT_HPP
+#ifndef ASSIGNMENT10_INCLUDE_HIT_HPP
+#define ASSIGNMENT10_INCLUDE_HIT_HPP
 
 #include "ray.h"
 #include "vectors.h"
@@ -38,11 +38,20 @@ class Hit {
         material = m;
         normal = n;
         intersectionPoint = ray.pointAtParameter(t);
+        if (normal.Length() > 1e-4) {
+            normal.Normalize();
+            dpdu = Vec3f(1, 0, 0);
+            if (std::abs(dot(normal, dpdu)) > 0.99) {
+                dpdu = Vec3f(0, 1, 0);
+            }
+            dpdu = cross(normal, dpdu);
+        }
     }
+    Vec3f dpdu;
 
    private:
     // REPRESENTATION
-    float t;
+    float t = INFINITY;
     Material *material;
     Vec3f normal;
     Vec3f intersectionPoint;
@@ -55,4 +64,4 @@ inline ostream &operator<<(ostream &os, const Hit &h) {
 // ====================================================================
 // ====================================================================
 
-#endif /* ASSIGNMENT5_HIT_HPP */
+#endif /* ASSIGNMENT10_INCLUDE_HIT_HPP */

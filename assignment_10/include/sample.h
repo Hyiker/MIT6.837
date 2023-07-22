@@ -1,5 +1,5 @@
-#ifndef _SAMPLE_H_
-#define _SAMPLE_H_
+#ifndef ASSIGNMENT10_INCLUDE_SAMPLE_HPP
+#define ASSIGNMENT10_INCLUDE_SAMPLE_HPP
 
 #include "vectors.h"
 
@@ -36,4 +36,4 @@ class Sample {
 
 // ==================================================================
 
-#endif
+#endif /* ASSIGNMENT10_INCLUDE_SAMPLE_HPP */

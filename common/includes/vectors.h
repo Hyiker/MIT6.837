@@ -292,6 +292,20 @@ class Vec3f {
         data[2] /= f;
         return *this;
     }
+    Vec3f operator-() const {
+        Vec3f v;
+        v.data[0] = -data[0];
+        v.data[1] = -data[1];
+        v.data[2] = -data[2];
+        return v;
+    }
+    Vec3f operator/(float f) const {
+        Vec3f v = *this;
+        v.data[0] = data[0] / f;
+        v.data[1] = data[1] / f;
+        v.data[2] = data[2] / f;
+        return v;
+    }
 
     friend Vec3f operator+(const Vec3f &v1, const Vec3f &v2) {
         Vec3f v3;
@@ -614,6 +628,21 @@ class Vec4f {
 inline ostream &operator<<(ostream &os, const Vec3f &v) {
     os << "Vec3f <" << v.x() << ", " << v.y() << ", " << v.z() << ">";
     return os;
+}
+inline Vec3f normalize(const Vec3f &v) {
+    Vec3f v2 = v;
+    v2.Normalize();
+    return v2;
+}
+inline Vec3f cross(const Vec3f &v1, const Vec3f &v2) {
+    Vec3f v3;
+    Vec3f::Cross3(v3, v1, v2);
+    return v3;
+}
+
+inline float dot(const Vec3f &v1, const Vec3f &v2) { return v1.Dot3(v2); }
+inline float absDot(const Vec3f &v1, const Vec3f &v2) {
+    return std::abs(dot(v1, v2));
 }
 
 // ====================================================================
