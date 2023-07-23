@@ -5,24 +5,18 @@
 #include "scene.hpp"
 class Integrator {
    public:
-    Integrator(int max_bounces, std::unique_ptr<GlobalSampler> sampler)
-        : m_max_bounces(max_bounces), m_sampler(std::move(sampler)) {}
+    Integrator(int max_bounces) : m_max_bounces(max_bounces) {}
     virtual Vec3f L(const Scene& scene, GlobalSampler& sampler,
                     const Ray& ray) const = 0;
     virtual ~Integrator() = default;
     int getMaxBounces() const { return m_max_bounces; }
-    std::unique_ptr<GlobalSampler> getSampler(int seed) const {
-        return m_sampler->clone(seed);
-    }
 
    protected:
     int m_max_bounces;
-    std::unique_ptr<GlobalSampler> m_sampler;
 };
 class PathIntegrator : public Integrator {
    public:
-    PathIntegrator(int max_bounces, std::unique_ptr<GlobalSampler> sampler)
-        : Integrator(max_bounces, std::move(sampler)) {}
+    PathIntegrator(int max_bounces) : Integrator(max_bounces) {}
     Vec3f L(const Scene& scene, GlobalSampler& sampler,
             const Ray& ray) const override;
 };

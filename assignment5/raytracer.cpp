@@ -31,7 +31,8 @@ RayTracer::RayTracer(SceneParser* s, int max_bounces, float cutoff_weight,
 }
 Vec3f RayTracer::traceRay(Ray& ray, float tmin, int bounces, float weight,
                           float indexOfRefraction, Hit& hit) const {
-    Object3D* target = getOptions().grid ? (Object3D*)grid : scene->getGroup();
+    Object3D* target =
+        getOptions().visualize_grid ? (Object3D*)grid : scene->getGroup();
     bool intersected = target->intersect(ray, hit, tmin);
     if (bounces > maxBounces || weight < cutoffWeight) return Vec3f(0, 0, 0);
     // only contribute background color when bounce <= maxBounces

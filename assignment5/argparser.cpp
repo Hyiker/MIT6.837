@@ -65,7 +65,7 @@ void parse_args(int argc, const char **argv) {
             assert(i < argc);
             options.cutoff_weight = atof(argv[i]);
         } else if (!strcmp(argv[i], "-visualize_grid")) {
-            options.grid = true;
+            options.visualize_grid = true;
         } else if (!strcmp(argv[i], "-grid")) {
             i++;
             assert(i < argc);

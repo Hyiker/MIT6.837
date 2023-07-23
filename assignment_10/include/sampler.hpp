@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT7_SAMPLER_HPP
-#define ASSIGNMENT7_SAMPLER_HPP
+#ifndef ASSIGNMENT_10_INCLUDE_SAMPLER_HPP
+#define ASSIGNMENT_10_INCLUDE_SAMPLER_HPP
 #include <memory>
 #include <random>
 
@@ -19,7 +19,8 @@ class Sampler {
 };
 class GlobalSampler : public Sampler {
    public:
-    GlobalSampler() : Sampler(-1) {}
+    using Sampler::Sampler;
+    GlobalSampler() : Sampler(1) {}
     Vec2f getSamplePosition(int) override { return Vec2f(0.f, 0.f); }
 
     float get1D() { return getSample(); }
@@ -27,34 +28,34 @@ class GlobalSampler : public Sampler {
     Vec3f get3D() { return Vec3f(getSample(), getSample(), getSample()); }
     void setSeed(int seed) { m_gen.seed(seed); }
     std::unique_ptr<GlobalSampler> clone(int seed) {
-        auto sampler = std::make_unique<GlobalSampler>();
+        auto sampler = std::make_unique<GlobalSampler>(m_spp);
         sampler->setSeed(seed);
         return sampler;
     }
 };
-class RandomSampler : public Sampler {
+class RandomSampler : public GlobalSampler {
    public:
-    RandomSampler(int spp) : Sampler(spp) {}
+    RandomSampler(int spp) : GlobalSampler(spp) {}
     Vec2f getSamplePosition(int n) override;
 };
-class UniformSampler : public Sampler {
+class UniformSampler : public GlobalSampler {
    public:
-    UniformSampler(int spp) : Sampler(spp), m_sqrt_spp(std::sqrt(spp)) {}
-    Vec2f getSamplePosition(int n) override;
-
-   private:
-    int m_sqrt_spp = std::sqrt(m_spp);
-};
-class JitteredSampler : public Sampler {
-   public:
-    JitteredSampler(int spp) : Sampler(spp), m_sqrt_spp(std::sqrt(spp)) {}
+    UniformSampler(int spp) : GlobalSampler(spp), m_sqrt_spp(std::sqrt(spp)) {}
     Vec2f getSamplePosition(int n) override;
 
    private:
     int m_sqrt_spp = std::sqrt(m_spp);
 };
+class JitteredSampler : public GlobalSampler {
+   public:
+    JitteredSampler(int spp) : GlobalSampler(spp), m_sqrt_spp(std::sqrt(spp)) {}
+    Vec2f getSamplePosition(int n) override;
 
-std::unique_ptr<Sampler> createPixelSampler(const Options& opt);
+   private:
+    int m_sqrt_spp = std::sqrt(m_spp);
+};
+
+std::unique_ptr<Sampler> createSampler(const Options& opt);
 std::unique_ptr<GlobalSampler> createGlobalSampler();
 
-#endif /* ASSIGNMENT7_SAMPLER_HPP */
+#endif /* ASSIGNMENT_10_INCLUDE_SAMPLER_HPP */

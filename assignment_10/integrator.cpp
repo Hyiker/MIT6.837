@@ -105,7 +105,5 @@ Vec3f PathIntegrator::L(const Scene& scene, GlobalSampler& sampler,
     return L;
 }
 std::unique_ptr<Integrator> createIntegrator(const Options& opt) {
-    std::unique_ptr<GlobalSampler> sampler = createGlobalSampler();
-    return std::make_unique<PathIntegrator>(opt.max_bounces,
-                                            std::move(sampler));
+    return std::make_unique<PathIntegrator>(opt.max_bounces);
 }

@@ -68,9 +68,8 @@ int main(int argc, const char** argv) {
     }
     auto integrator = createIntegrator(options);
 
-    rayTracerPtr =
-        new RayTracer(make_unique<Scene>(scenePtr, gridPtr),
-                      std::move(integrator), createPixelSampler(options));
+    rayTracerPtr = new RayTracer(make_unique<Scene>(scenePtr, gridPtr),
+                                 std::move(integrator), createSampler(options));
     filmPtr = new Film(options.width, options.height, rayTracerPtr->getSpp(),
                        createFilter(options));
 

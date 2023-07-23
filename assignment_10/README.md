@@ -6,12 +6,13 @@ In this assignment, I'll try to introduce some modern rendering technical flavor
 
 ## Features
 
-- [ ] Path tracing
-  - [ ] NEE(Next Event Estimation)
+- [x] Path tracing
+  - [x] NEE(Next Event Estimation)
 - [ ] PBR materials(BxDF)
   - [ ] Diffusive
   - [ ] Glossy
   - [ ] Transparent
   - [ ] Subsurface scattering
+- [x] Parallel rendering(using [oneTBB](https://github.com/oneapi-src/oneTBB))
 
 ## Showcase

@@ -16,7 +16,7 @@ Vec2f JitteredSampler::getSamplePosition(int n) {
     return Vec2f(x * d * 2.0f + d + jitter.x(), y * d * 2.0f + d + jitter.y());
 }
 
-std::unique_ptr<Sampler> createPixelSampler(const Options& opt) {
+std::unique_ptr<Sampler> createSampler(const Options& opt) {
     if (opt.uniform_samples)
         return std::make_unique<UniformSampler>(opt.uniform_samples);
     else if (opt.jittered_samples)

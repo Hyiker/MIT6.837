@@ -1,19 +1,21 @@
 #include "raytracer.hpp"
 
 #include <corecrt_math.h>
+#include <oneapi/tbb/blocked_range2d.h>
+#include <oneapi/tbb/parallel_for.h>
 
 #include <memory>
 #include <unordered_set>
 
 #include "argparser.hpp"
 #include "camera.h"
-#include "group.h"
 #include "light.h"
 #include "material.h"
 #include "progressreporter.h"
 #include "rayTree.h"
 #include "raytracing_stats.h"
 
+using oneapi::tbb::parallel_for, oneapi::tbb::blocked_range2d;
 Vec3f reflect(const Vec3f& v, const Vec3f& n) { return v - 2 * v.Dot3(n) * n; }
 bool refract(const Vec3f& wi, const Vec3f& n, float eta, Vec3f* wt) {
     // Compute $\cos \theta_\roman{t}$ using Snell's law
@@ -39,22 +41,40 @@ void RayTracer::render(Film& film) {
     ProgressReporter reporter(
         film.getWidth() * film.getHeight() * m_pixel_sampler->getSpp(),
         "Rendering");
+    constexpr int tileSize = 16;
+    int nTileX = std::ceil((float)film.getWidth() / tileSize),
+        nTileY = std::ceil((float)film.getHeight() / tileSize);
+    int spp = m_pixel_sampler->getSpp();
     // rendering full resolution, crop afterwards
-    for (int y = 0; y < film.getWidth(); y++) {
-        for (int x = 0; x < film.getHeight(); x++) {
-            std::unique_ptr<GlobalSampler> sampler =
-                m_integrator->getSampler(x * film.getHeight() + y);
-            // generate one sampler for each pixel
-            for (int i = 0; i < m_pixel_sampler->getSpp(); i++) {
-                Vec2f uv = m_pixel_sampler->getSamplePosition(i);
-                Ray ray = generateRay(Vec2f((x + uv.x()) / film.getWidth(),
-                                            (y + uv.y()) / film.getHeight()));
-                film.setSample(x, y, i, uv,
-                               m_integrator->L(*m_scene, *sampler, ray));
-                reporter.Update();
+    auto renderFunc = [&](const blocked_range2d<int>& r) {
+        for (int y_ = r.rows().begin(); y_ < r.rows().end(); y_++) {
+            for (int x_ = r.cols().begin(); x_ < r.cols().end(); x_++) {
+                int seed = x_ * film.getHeight() + y_;
+                std::unique_ptr<GlobalSampler> sampler =
+                    dynamic_cast<GlobalSampler&>(*m_pixel_sampler).clone(seed);
+                int x0 = x_ * tileSize, x1 = (x_ + 1) * tileSize,
+                    y0 = y_ * tileSize, y1 = (y_ + 1) * tileSize;
+                x1 = std::min(x1, film.getWidth());
+                y1 = std::min(y1, film.getHeight());
+                for (int y = y0; y < y1; y++) {
+                    for (int x = x0; x < x1; x++) {
+                        // generate one sampler for each pixel
+                        for (int i = 0; i < spp; i++) {
+                            Vec2f uv = sampler->getSamplePosition(i);
+                            Ray ray = generateRay(
+                                Vec2f((x + uv.x()) / film.getWidth(),
+                                      (y + uv.y()) / film.getHeight()));
+                            film.setSample(
+                                x, y, i, uv,
+                                m_integrator->L(*m_scene, *sampler, ray));
+                            reporter.Update();
+                        }
+                    }
+                }
             }
         }
-    }
+    };
+    parallel_for(blocked_range2d<int>(0, nTileY, 0, nTileX), renderFunc);
 
     reporter.Done();
 }
