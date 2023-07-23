@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT6_SCENE_PARSER_HPP
-#define ASSIGNMENT6_SCENE_PARSER_HPP
+#ifndef ASSIGNMENT_10_INCLUDE_SCENE_PARSER_HPP
+#define ASSIGNMENT_10_INCLUDE_SCENE_PARSER_HPP
 
 #include <assert.h>
 
@@ -94,4 +94,4 @@ class SceneParser {
 // ====================================================================
 // ====================================================================
 
-#endif /* ASSIGNMENT6_SCENE_PARSER_HPP */
+#endif /* ASSIGNMENT_10_INCLUDE_SCENE_PARSER_HPP */

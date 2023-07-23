@@ -1,5 +1,6 @@
 #include "integrator.hpp"
 
+#include <cmath>
 #include <memory>
 
 #include "frame.hpp"
@@ -12,21 +13,21 @@ Vec3f sampleLight(const Scene& scene, const Ray& ray, const Hit& hit,
     Vec3f L(0, 0, 0);
     // consider ambient as environment light
     // sampling hemisphere
-    float lightPdf = 0;
-    Vec3f wiWS = brdf.frame.localToWorld(
-        cosineWeightedHemisphereSample(sampler.get2D(), lightPdf));
+    float brdfPdf = 0;
+    Vec3f woWS = -normalize(ray.getDirection());
+    Vec3f wiWS = brdf.importanceSample(woWS, sampler.get2D(), &brdfPdf);
     Vec3f n = normalize(hit.getNormal());
 
     // evaluate environment light
     Vec3f env = scene.getAmbientLight() * absDot(n, wiWS);
-    if (lightPdf > 0) {
-        Vec3f f = brdf.eval(-ray.getDirection(), wiWS);
+    if (brdfPdf > 0) {
+        Vec3f f = brdf.eval(woWS, wiWS) * absDot(n, wiWS);
         // test visibility
         Ray shadowRay = Ray(hit.getIntersectionPoint() + n * 1e-4, wiWS);
         Hit hit;
         bool occluded = scene.intersect(shadowRay, hit, 0);
         if (!occluded) {
-            L += f * env / lightPdf;
+            L += f * env / brdfPdf;
         }
     }
 
@@ -83,15 +84,14 @@ Vec3f PathIntegrator::L(const Scene& scene, GlobalSampler& sampler,
 
         // sample brdf
         float pdf = 0;
-        Vec3f wiWS = brdf->frame.localToWorld(
-            cosineWeightedHemisphereSample(sampler.get2D(), pdf));
+        Vec3f wiWS = brdf->importanceSample(woWS, sampler.get2D(), &pdf);
         Vec3f f = brdf->eval(woWS, wiWS);
         if (f.Length() == 0 || pdf == 0) {
             break;
         }
         beta = beta * f * absDot(n, wiWS) / pdf;
 
-        Vec3f origin = hit.getIntersectionPoint() + 0.001 * n;
+        Vec3f origin = hit.getIntersectionPoint() + 1e-4 * n;
         r = Ray(origin, wiWS);
 
         if (bounce > 3) {

@@ -8,11 +8,12 @@ In this assignment, I'll try to introduce some modern rendering technical flavor
 
 - [x] Path tracing
   - [x] NEE(Next Event Estimation)
-- [ ] PBR materials(BxDF)
-  - [ ] Diffusive
-  - [ ] Glossy
-  - [ ] Transparent
-  - [ ] Subsurface scattering
+  - [ ] BRDF Importance Sampling
+- [x] PBR materials
+  - [x] (Disney Principled BRDF)
 - [x] Parallel rendering(using [oneTBB](https://github.com/oneapi-src/oneTBB))
 
 ## Showcase
+
+![scene1](./imgs/scene1.png)
+perfect mirror sphere and glossy bunny(512 SPP)

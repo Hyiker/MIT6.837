@@ -11,6 +11,7 @@
 #include "camera.h"
 #include "light.h"
 #include "material.h"
+#include "oneapi/tbb/partitioner.h"
 #include "progressreporter.h"
 #include "rayTree.h"
 #include "raytracing_stats.h"
@@ -41,7 +42,7 @@ void RayTracer::render(Film& film) {
     ProgressReporter reporter(
         film.getWidth() * film.getHeight() * m_pixel_sampler->getSpp(),
         "Rendering");
-    constexpr int tileSize = 16;
+    constexpr int tileSize = 200;
     int nTileX = std::ceil((float)film.getWidth() / tileSize),
         nTileY = std::ceil((float)film.getHeight() / tileSize);
     int spp = m_pixel_sampler->getSpp();
@@ -74,7 +75,8 @@ void RayTracer::render(Film& film) {
             }
         }
     };
-    parallel_for(blocked_range2d<int>(0, nTileY, 0, nTileX), renderFunc);
+    parallel_for(blocked_range2d<int>(0, nTileY, 0, nTileX), renderFunc,
+                 tbb::auto_partitioner());
 
     reporter.Done();
 }

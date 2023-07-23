@@ -644,6 +644,9 @@ inline float dot(const Vec3f &v1, const Vec3f &v2) { return v1.Dot3(v2); }
 inline float absDot(const Vec3f &v1, const Vec3f &v2) {
     return std::abs(dot(v1, v2));
 }
+inline Vec3f abs(const Vec3f &v) {
+    return Vec3f(std::abs(v.x()), std::abs(v.y()), std::abs(v.z()));
+}
 
 // ====================================================================
 // ====================================================================

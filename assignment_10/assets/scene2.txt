@@ -1,0 +1,71 @@
+
+PerspectiveCamera {
+    center -0.3 0.3 1.0
+    direction 0.1 -0.2 -0.9
+    up 0 1 0
+    angle 45
+}
+
+Lights {
+    numLights 1
+    DirectionalLight {
+        direction -0.7 -0.8 -1
+        color 0.3 0.3 0.3
+    }
+}
+
+Background {
+    color 0.86 0.92 1.0
+    ambientLight 0.86 0.92 1.0
+}
+
+Materials {
+    numMaterials 3
+    UberMaterial {
+        baseColor 0.96 0.75 0.66
+        subsurface 0.8
+        metallic 0.6
+        specular 0.3
+        roughness 0.8
+    }
+    UberMaterial {
+        baseColor 1.0 1.0 1.0
+        subsurface 0.0
+        metallic 0.7
+        specular 0.1
+        roughness 0.2
+
+    }
+    UberMaterial {
+        baseColor 0.7 0.9 0.7
+        subsurface 0.0
+        metallic 0.0
+        specular 0.3
+        roughness 0.8
+    }
+}
+
+Group {
+    numObjects 3
+
+    MaterialIndex 0
+    Transform {
+        Translate 0.0 -0.068 0.0
+        TriangleMesh {
+            obj_file bunny_5k.obj
+        }
+    }
+
+    MaterialIndex 1
+    Sphere {
+        Center -0.4 0.15 0.0
+        Radius 0.15
+    }
+
+    MaterialIndex 2
+    Plane {
+	normal 0 1 0
+        offset 0.0
+    }
+}
+

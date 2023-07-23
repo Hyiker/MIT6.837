@@ -271,6 +271,11 @@ void GLCanvas::keyboard(unsigned char key, int i, int j) {
             display();
             break;
         }
+        case 'c':
+        case 'C': {
+            // print camera parameters
+            scene->getCamera()->print();
+        }
         case 'g':
         case 'G': {
             // toggle ray-grid march visualization

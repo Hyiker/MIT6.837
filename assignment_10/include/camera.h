@@ -16,6 +16,7 @@ class Camera {
     virtual void dollyCamera(float dist) = 0;
     virtual void truckCamera(float dx, float dy) = 0;
     virtual void rotateCamera(float rx, float ry) = 0;
+    virtual void print() const = 0;
 };
 
 class OrthographicCamera : public Camera {
@@ -48,6 +49,13 @@ class OrthographicCamera : public Camera {
     void dollyCamera(float dist) override;
     void truckCamera(float dx, float dy) override;
     void rotateCamera(float rx, float ry) override;
+    void print() const override {
+        std::cout << "OrthographicCamera: " << std::endl;
+        std::cout << "center: " << m_center << std::endl;
+        std::cout << "direction: " << m_direction << std::endl;
+        std::cout << "up: " << m_up << std::endl;
+        std::cout << "size: " << m_size << std::endl;
+    }
 
    private:
     Vec3f m_center;
@@ -87,6 +95,13 @@ class PerspectiveCamera : public Camera {
     void dollyCamera(float dist) override;
     void truckCamera(float dx, float dy) override;
     void rotateCamera(float rx, float ry) override;
+    void print() const override {
+        std::cout << "PerspectiveCamera: " << std::endl;
+        std::cout << "center: " << m_center << std::endl;
+        std::cout << "direction: " << m_direction << std::endl;
+        std::cout << "up: " << m_up << std::endl;
+        std::cout << "fov: " << m_fov << std::endl;
+    }
 
    private:
     Vec3f m_center;
