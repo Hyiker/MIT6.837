@@ -28,9 +28,12 @@ class PrincipledBRDF : public BRDF {
           metallic(metallic),
           specular(specular),
           roughness(roughness) {}
+
     Vec3f f(const Vec3f &wo, const Vec3f &wi) const override;
 
    private:
+    Vec3f evalDiffuse(const Vec3f &wo, const Vec3f &wi) const;
+    Vec3f evalSubsurface(const Vec3f &wo, const Vec3f &wi) const;
     Vec3f baseColor;
     float subsurface;
     float metallic;

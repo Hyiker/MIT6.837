@@ -3,6 +3,7 @@
 #include <memory>
 
 #include "frame.hpp"
+#include "light.h"
 #include "material.h"
 #include "sampling.hpp"
 constexpr float Q = 0.15f;
@@ -15,6 +16,8 @@ Vec3f sampleLight(const Scene& scene, const Ray& ray, const Hit& hit,
     Vec3f wiWS = brdf.frame.localToWorld(
         cosineWeightedHemisphereSample(sampler.get2D(), lightPdf));
     Vec3f n = normalize(hit.getNormal());
+
+    // evaluate environment light
     Vec3f env = scene.getAmbientLight() * absDot(n, wiWS);
     if (lightPdf > 0) {
         Vec3f f = brdf.eval(-ray.getDirection(), wiWS);
@@ -25,6 +28,27 @@ Vec3f sampleLight(const Scene& scene, const Ray& ray, const Hit& hit,
         if (!occluded) {
             L += f * env / lightPdf;
         }
+    }
+
+    // evaluate directional light
+    // they are dirac delta function, so no need to sample
+    // https://computergraphics.stackexchange.com/questions/12455/how-are-point-and-pure-directional-lights-sampled-in-an-unbiased-path-tracer
+    for (int i = 0; i < scene.getNumLights(); i++) {
+        Light* light = scene.getLight(i);
+
+        Vec3f wiWS;
+        Vec3f illum(0, 0, 0);
+        float d = INFINITY;
+        light->getIllumination(hit.getIntersectionPoint(), wiWS, illum, d);
+        // visibility test
+        Ray shadowRay = Ray(hit.getIntersectionPoint() + n * 1e-4, wiWS);
+        Hit hit;
+        bool occluded = scene.intersect(shadowRay, hit, 0);
+        if (occluded) {
+            continue;
+        }
+        Vec3f f = brdf.eval(-ray.getDirection(), wiWS);
+        L += f * illum * absDot(n, wiWS);
     }
 
     return L;

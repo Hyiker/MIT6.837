@@ -10,8 +10,10 @@
 #include "group.h"
 #include "light.h"
 #include "material.h"
+#include "progressreporter.h"
 #include "rayTree.h"
 #include "raytracing_stats.h"
+
 Vec3f reflect(const Vec3f& v, const Vec3f& n) { return v - 2 * v.Dot3(n) * n; }
 bool refract(const Vec3f& wi, const Vec3f& n, float eta, Vec3f* wt) {
     // Compute $\cos \theta_\roman{t}$ using Snell's law
@@ -34,6 +36,9 @@ RayTracer::RayTracer(std::unique_ptr<Scene> scene,
       cutOffWeight(cutOffWeight) {}
 void RayTracer::render(Film& film) {
     assert(samplerPtr != nullptr);
+    ProgressReporter reporter(
+        film.getWidth() * film.getHeight() * m_pixel_sampler->getSpp(),
+        "Rendering");
     // rendering full resolution, crop afterwards
     for (int y = 0; y < film.getWidth(); y++) {
         for (int x = 0; x < film.getHeight(); x++) {
@@ -46,14 +51,12 @@ void RayTracer::render(Film& film) {
                                             (y + uv.y()) / film.getHeight()));
                 film.setSample(x, y, i, uv,
                                m_integrator->L(*m_scene, *sampler, ray));
-                // Hit hit;
-                // hit.set(INFINITY, nullptr, Vec3f(), ray);
-                // film.setSample(
-                //     x, y, i, uv,
-                //     traceRayRadiosity(ray, getTMin(), 0, 1.0, 1.0, hit));
+                reporter.Update();
             }
         }
     }
+
+    reporter.Done();
 }
 Ray RayTracer::generateRay(const Vec2f& uv) const {
     Camera* camera = m_scene->getCamera();

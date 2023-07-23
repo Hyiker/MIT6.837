@@ -14,6 +14,7 @@ class Light {
     virtual ~Light() {}
 
     // VIRTUAL METHODS
+    // p -> light
     virtual void getIllumination(const Vec3f &p, Vec3f &dir, Vec3f &col,
                                  float &distanceToLight) const = 0;
     virtual void glInit(int id) = 0;

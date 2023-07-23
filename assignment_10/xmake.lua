@@ -1,9 +1,9 @@
-add_requires("opengl", "glu", "tbb")
+add_requires("opengl", "glu")
 
 target("raytracerx")
     set_kind("binary")
     add_deps("common")
-    add_packages("opengl", "glu", "tbb")
+    add_packages("opengl", "glu")
 
     add_includedirs("include")
     add_files("*.cpp")
@@ -23,7 +23,7 @@ task("raytracerx_scenes")
         local imgs = path.join(os.scriptdir(), "imgs")
 
         -- os.exec("xmake r raytracerx -input ".. assets .."/scene7_03_marble_vase.txt -size 200 200 -output ".. imgs .."/output7_03a.tga -shadows -jittered_samples 16 -tent_filter 1.0 -bounces 1")
-        os.exec("xmake r raytracerx -input ".. assets .."/marble_vase_pbr.txt -size 200 200 -output ".. imgs .."/marble_vase_pbr.tga -shadows -jittered_samples 4 -tent_filter 1.0 -bounces 4")
+        os.exec("xmake r raytracerx -input ".. assets .."/marble_vase_pbr.txt -size 200 200 -output ".. imgs .."/marble_vase_pbr.tga -shadows -jittered_samples 4 -tent_filter 1.0 -bounces 10")
 
     end)
     set_menu{}

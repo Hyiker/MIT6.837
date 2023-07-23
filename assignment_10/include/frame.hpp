@@ -19,4 +19,6 @@ class Frame {
     Vec3f m_ss, m_ts, m_n;
 };
 
+inline float cosTheta(const Vec3f& w) { return w.z(); }
+
 #endif /* ASSIGNMENT10_INCLUDE_INTERSECTION_HPP */

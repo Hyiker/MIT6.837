@@ -13,6 +13,5 @@ In this assignment, I'll try to introduce some modern rendering technical flavor
   - [ ] Glossy
   - [ ] Transparent
   - [ ] Subsurface scattering
-- [ ] Parallel rendering(using [oneTBB](https://github.com/oneapi-src/oneTBB))
 
 ## Showcase

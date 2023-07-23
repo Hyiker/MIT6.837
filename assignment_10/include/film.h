@@ -32,11 +32,20 @@ class Film {
     int getWidth() { return width; }
     int getHeight() { return height; }
     int getNumSamples() { return num_samples; }
-    Sample getSample(int i, int j, int n) { return samples[getIndex(i, j, n)]; }
+    Sample getSample(int i, int j, int n) const {
+        return samples[getIndex(i, j, n)];
+    }
 
     // MODIFIERS
     void setSample(int x, int y, int i, Vec2f offset, Vec3f color) {
         samples[getIndex(x, y, i)].set(offset, color);
+    }
+
+    int getIndex(int i, int j, int n) const {
+        assert(i >= 0 && i < width);
+        assert(j >= 0 && j < height);
+        assert(n >= 0 && n < num_samples);
+        return i * height * num_samples + j * num_samples + n;
     }
 
     // VISUALIZATION
@@ -48,12 +57,6 @@ class Film {
 
    private:
     Film() { assert(0); }  // don't use this constructor
-    int getIndex(int i, int j, int n) {
-        assert(i >= 0 && i < width);
-        assert(j >= 0 && j < height);
-        assert(n >= 0 && n < num_samples);
-        return i * height * num_samples + j * num_samples + n;
-    }
 
     // REPRESENTATION
     int width;
