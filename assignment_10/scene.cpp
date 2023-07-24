@@ -3,19 +3,47 @@
 #include <unordered_set>
 
 #include "group.h"
+#include "plane.h"
 #include "raytracing_stats.h"
-Scene::Scene(SceneParser* scene_parser, Grid* grid)
-    : m_scene_parser(scene_parser), m_grid(grid) {
+#include "transform.h"
+Scene::Scene(SceneParser* scene_parser, Grid* grid, BVH* bvh)
+    : m_scene_parser(scene_parser), m_grid(grid), m_bvh(bvh) {
+    m_scene_parser->getGroup()->flatten();
+    auto group = m_scene_parser->getGroup();
     if (m_grid) {
-        m_scene_parser->getGroup()->insertIntoGrid(grid, nullptr);
+        group->insertIntoGrid(grid, nullptr);
+    }
+    if (m_bvh) {
+        std::vector<Object3D*> objs;
+        for (Object3D* obj : group->getObjects()) {
+            bool isInfinite = false;
+            if (auto transform = dynamic_cast<Transform*>(obj); transform) {
+                isInfinite = dynamic_cast<Plane*>(transform->getObject());
+            } else {
+                isInfinite = dynamic_cast<Plane*>(obj);
+            }
+            if (isInfinite)
+                m_bvh->infiniteObjects.push_back(obj);
+            else
+                objs.push_back(obj);
+        }
+
+        m_bvh->build(objs);
+        std::cout << "BVH built" << std::endl;
     }
 }
 
 bool Scene::intersect(const Ray& r, Hit& h, float tmin) const {
-    if (m_grid) return intersectFast(r, h, tmin);
+    if (m_grid)
+        return intersectFastGrid(r, h, tmin);
+    else if (m_bvh)
+        return intersectFastBVH(r, h, tmin);
     return m_scene_parser->getGroup()->intersect(r, h, tmin);
 }
-bool Scene::intersectFast(const Ray& r, Hit& h, float tmin) const {
+bool Scene::intersectFastBVH(const Ray& r, Hit& h, float tmin) const {
+    return m_bvh->intersect(r, h, tmin);
+}
+bool Scene::intersectFastGrid(const Ray& r, Hit& h, float tmin) const {
     std::unordered_set<Object3D*> passBys;
     // check infinite geometries first
     bool hit_fb = m_grid->intersectInfiniteObjects(r, h, tmin);

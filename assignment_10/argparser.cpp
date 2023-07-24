@@ -117,6 +117,10 @@ void parse_args(int argc, const char **argv) {
             i++;
             assert(i < argc);
             options.filter_zoom = atoi(argv[i]);
+        } else if (!strcmp(argv[i], "-bvh")) {
+            options.bvh = true;
+        } else if (!strcmp(argv[i], "-visualize_bvh")) {
+            options.visualize_bvh = true;
         } else {
             printf("whoops error with command line argument %d: '%s'\n", i,
                    argv[i]);

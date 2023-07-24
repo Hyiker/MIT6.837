@@ -15,6 +15,7 @@
 
 class SceneParser;
 class Grid;
+class BVH;
 
 // ====================================================================
 // OPTIONAL: 3 pass rendering to fix the specular highlight
@@ -41,7 +42,9 @@ class GLCanvas {
 
     // A pointer to the grid
     static Grid *grid;
+    static BVH *bvh;
     static bool visualize_grid;
+    static bool visualize_bvh;
     static int visualize_grid_march;
 
     // Helper function for the display routine
@@ -73,7 +76,7 @@ class GLCanvas {
 
     void initialize(SceneParser *_scene, void (*_renderFunction)(void),
                     void (*_traceRayFunction)(float, float), Grid *_grid,
-                    bool _visualize_grid);
+                    BVH *_bvh, bool _visualize_grid, bool _visualize_bvh);
 };
 
 // ====================================================================

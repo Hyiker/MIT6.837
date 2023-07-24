@@ -58,17 +58,20 @@ int main(int argc, const char** argv) {
 
     const Options& options = getOptions();
     auto scenePtr = new SceneParser(options.input_file);
-    scenePtr->getGroup()->flatten();
     Grid* gridPtr = nullptr;
+    BVH* bvhPtr = nullptr;
     if (options.grid_size[0]) {
         assert(scenePtr->getGroup()->getBoundingBox() != nullptr);
         gridPtr = new Grid(scenePtr->getGroup()->getBoundingBox(),
                            options.grid_size[0], options.grid_size[1],
                            options.grid_size[2]);
     }
+    if (options.bvh) {
+        bvhPtr = new BVH();
+    }
     auto integrator = createIntegrator(options);
 
-    rayTracerPtr = new RayTracer(make_unique<Scene>(scenePtr, gridPtr),
+    rayTracerPtr = new RayTracer(make_unique<Scene>(scenePtr, gridPtr, bvhPtr),
                                  std::move(integrator), createSampler(options));
     filmPtr = new Film(options.width, options.height, rayTracerPtr->getSpp(),
                        createFilter(options));
@@ -79,7 +82,8 @@ int main(int argc, const char** argv) {
     if (options.gui) {
         GLCanvas canvas;
         canvas.initialize(scenePtr, dispatchWithoutArgs, traceRay, gridPtr,
-                          options.visualize_grid);
+                          bvhPtr, options.visualize_grid,
+                          options.visualize_bvh);
     } else {
         dispatch(options);
     }

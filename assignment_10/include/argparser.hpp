@@ -29,6 +29,8 @@ struct Options {
     float gaussian_filter_sigma = -1.0f;
     const char *filter_file = nullptr;
     int filter_zoom{1};
+    bool bvh = false;
+    bool visualize_bvh = false;
 };
 void parse_args(int argc, const char **argv);
 const Options &getOptions();

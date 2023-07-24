@@ -1,5 +1,6 @@
 #include "glCanvas.h"
 
+#include "bvh.hpp"
 #include "camera.h"
 #include "grid.h"
 #include "group.h"
@@ -23,7 +24,9 @@ SceneParser *GLCanvas::scene;
 
 // A pointer to the grid
 Grid *GLCanvas::grid;
+BVH *GLCanvas::bvh;
 bool GLCanvas::visualize_grid = 0;
+bool GLCanvas::visualize_bvh = 0;
 int GLCanvas::visualize_grid_march = 0;
 
 // State of the mouse cursor
@@ -132,6 +135,8 @@ void GLCanvas::display(void) {
             RayTree::paintEnteredFaces();
             grid->getBoundingBox()->paint();
         }
+    } else if (visualize_bvh) {
+        bvh->paint();
     } else {
 #if !SPECULAR_FIX
 
@@ -302,10 +307,13 @@ void GLCanvas::keyboard(unsigned char key, int i, int j) {
 
 void GLCanvas::initialize(SceneParser *_scene, void (*_renderFunction)(void),
                           void (*_traceRayFunction)(float, float), Grid *_grid,
-                          bool _visualize_grid) {
+                          BVH *_bvh, bool _visualize_grid,
+                          bool _visualize_bvh) {
     scene = _scene;
     grid = _grid;
+    bvh = _bvh;
     visualize_grid = _visualize_grid;
+    visualize_bvh = _visualize_bvh;
     renderFunction = _renderFunction;
     traceRayFunction = _traceRayFunction;
 

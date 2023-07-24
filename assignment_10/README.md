@@ -14,6 +14,7 @@ In this assignment, I'll try to introduce some modern rendering technical flavor
 - [x] Realistic camera
   - [x] Depth of Field
 - [x] Parallel rendering(using [oneTBB](https://github.com/oneapi-src/oneTBB))
+- [x] BVH(Bounding Volume Hierarchy), **~3x** faster than 30x30x30 grid method in the second scene shown below!
 
 ## Showcase
 
@@ -22,6 +23,9 @@ perfect mirror sphere and glossy bunny
 
 ![scene2](./imgs/scene2.png)
 Disney Principled BRDF, depth of field
+
+![bvh](./imgs/bvh.png)
+BVH visualization, ~3x faster than 30x30x30 grid method in previous scene
 
 ## References
 
