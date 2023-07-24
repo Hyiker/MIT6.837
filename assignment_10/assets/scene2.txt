@@ -24,17 +24,17 @@ Background {
 Materials {
     numMaterials 9
     UberMaterial {
-        baseColor 0.96 0.75 0.66
-        subsurface 0.8
+        baseColor 1 0.84 0.0
+        subsurface 0.0
         metallic 1.0
         specular 1.0
-        roughness 0.8
+        roughness 0.1
     }
     UberMaterial {
         baseColor 1.0 1.0 1.0
         subsurface 0.0
-        metallic 0.7
-        specular 0.1
+        metallic 1.0
+        specular 0.4
         roughness 0.2
 
     }

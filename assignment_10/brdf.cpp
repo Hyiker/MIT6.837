@@ -37,18 +37,22 @@ Vec3f PrincipledBRDF::f(const Vec3f &wo, const Vec3f &wi) const {
 void PrincipledBRDF::sample(const Vec3f &wo, Vec2f u, Vec3f *wi,
                             float *pdf) const {
     Vec3f h = sampleHalfVec(u);
-    *wi = reflect(wo, h);
-    if (!isSameHemisphere(wo, *wi)) {
+    Vec3f wiSpecular = reflect(wo, h);
+    if (!isSameHemisphere(wo, wiSpecular)) {
         *pdf = 0;
         return;
     }
+    Vec3f wiDiffuse = cosineWeightedHemisphereSample(u, *pdf);
+    *wi = mix(wiDiffuse, wiSpecular, metallic);
     *pdf = this->pdf(wo, *wi);
 }
 
 float PrincipledBRDF::pdf(const Vec3f &wo, const Vec3f &wi) const {
     if (!isSameHemisphere(wo, wi)) return 0;
     Vec3f h = normalize(wo + wi);
-    return DsPdf(h, wi);
+    float specularPdf = DsPdf(h, wi);
+    float diffusePdf = cosineWeightedHemiSphereSamplePdf(wi);
+    return mix(diffusePdf, specularPdf, metallic);
 }
 
 static float FD90(float cosTheta, float roughness) {

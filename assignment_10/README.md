@@ -10,7 +10,7 @@ In this assignment, I'll try to introduce some modern rendering technical flavor
   - [x] NEE(Next Event Estimation)
   - [x] BRDF Importance Sampling
 - [x] PBR materials
-  - [x] Disney Principled BRDF(simpified, without clearcoat and sheen)
+  - [x] Disney Principled BRDF(simplified version)
 - [x] Realistic camera
   - [x] Depth of Field
 - [x] Parallel rendering(using [oneTBB](https://github.com/oneapi-src/oneTBB))
@@ -19,6 +19,9 @@ In this assignment, I'll try to introduce some modern rendering technical flavor
 
 ![scene1](./imgs/scene1.png)
 perfect mirror sphere and glossy bunny
+
+![scene2](./imgs/scene2.png)
+Disney Principled BRDF, depth of field
 
 ## References
 

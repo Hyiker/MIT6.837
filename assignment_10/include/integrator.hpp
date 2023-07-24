@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT10_INCLUDE_INTEGRATOR_HPP
-#define ASSIGNMENT10_INCLUDE_INTEGRATOR_HPP
+#ifndef ASSIGNMENT_10_INCLUDE_INTEGRATOR_HPP
+#define ASSIGNMENT_10_INCLUDE_INTEGRATOR_HPP
 #include "ray.h"
 #include "sampler.hpp"
 #include "scene.hpp"
@@ -23,4 +23,4 @@ class PathIntegrator : public Integrator {
 
 std::unique_ptr<Integrator> createIntegrator(const Options& opt);
 
-#endif /* ASSIGNMENT10_INCLUDE_INTEGRATOR_HPP */
+#endif /* ASSIGNMENT_10_INCLUDE_INTEGRATOR_HPP */
