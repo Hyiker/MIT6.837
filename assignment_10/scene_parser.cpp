@@ -78,6 +78,8 @@ void SceneParser::parseFile() {
             parseOrthographicCamera();
         } else if (!strcmp(token, "PerspectiveCamera")) {
             parsePerspectiveCamera();
+        } else if (!strcmp(token, "RealisticCamera")) {
+            parseRealisticCamera();
         } else if (!strcmp(token, "Background")) {
             parseBackground();
         } else if (!strcmp(token, "Lights")) {
@@ -159,6 +161,37 @@ void SceneParser::parseBackground() {
             assert(0);
         }
     }
+}
+
+void SceneParser::parseRealisticCamera() {
+    char token[MAX_PARSER_TOKEN_LENGTH];
+    // read in the camera parameters
+    getToken(token);
+    assert(!strcmp(token, "{"));
+    getToken(token);
+    assert(!strcmp(token, "center"));
+    Vec3f center = readVec3f();
+    getToken(token);
+    assert(!strcmp(token, "direction"));
+    Vec3f direction = readVec3f();
+    getToken(token);
+    assert(!strcmp(token, "up"));
+    Vec3f up = readVec3f();
+    getToken(token);
+    assert(!strcmp(token, "angle"));
+    float angle_degrees = readFloat();
+    float angle_radians = DegreesToRadians(angle_degrees);
+    getToken(token);
+    assert(!strcmp(token, "focalLength"));
+    float focalLength = readFloat();
+    getToken(token);
+    assert(!strcmp(token, "aperture"));
+    float aperture = readFloat();
+    getToken(token);
+
+    assert(!strcmp(token, "}"));
+    camera = new RealisticCamera(center, direction, up, angle_radians,
+                                 focalLength, aperture);
 }
 
 // ====================================================================

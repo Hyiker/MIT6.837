@@ -58,25 +58,6 @@ class PhongMaterial : public Material {
     float indexOfRefraction;
 };
 
-class Checkerboard : public Material {
-   public:
-    Checkerboard(Matrix *m, Material *mat1, Material *mat2)
-        : Material(Vec3f(0, 0, 0)),
-          matrix(m),
-          material1(mat1),
-          material2(mat2) {}
-    ~Checkerboard() = default;
-    void glSetMaterial(void) const override;
-    Vec3f Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
-                const Vec3f &lightColor) const override;
-    Vec3f ShadeAmbient(const Vec3f &pWS,
-                       const Vec3f &lightColor) const override;
-
-   protected:
-    Matrix *matrix;
-    Material *material1;
-    Material *material2;
-};
 class Noise : public Material {
    public:
     Noise(Matrix *m, Material *mat1, Material *mat2, int octaves)
@@ -153,6 +134,26 @@ class UberMaterial : public PBRMaterial {
     float metallic;
     float specular;
     float roughness;
+};
+class Checkerboard : public PBRMaterial {
+   public:
+    Checkerboard(Matrix *m, Material *mat1, Material *mat2)
+        : PBRMaterial(Vec3f(0, 0, 0)),
+          matrix(m),
+          material1(mat1),
+          material2(mat2) {}
+    ~Checkerboard() = default;
+    void glSetMaterial(void) const override;
+    Vec3f Shade(const Ray &ray, const Hit &hit, const Vec3f &dirToLight,
+                const Vec3f &lightColor) const override;
+    Vec3f ShadeAmbient(const Vec3f &pWS,
+                       const Vec3f &lightColor) const override;
+    std::unique_ptr<BRDF> getBRDF(const Hit &hit) const override;
+
+   protected:
+    Matrix *matrix;
+    Material *material1;
+    Material *material2;
 };
 
 #endif /* ASSIGNMENT_10_INCLUDE_MATERIAL_HPP */

@@ -42,10 +42,11 @@ void RayTracer::render(Film& film) {
     ProgressReporter reporter(
         film.getWidth() * film.getHeight() * m_pixel_sampler->getSpp(),
         "Rendering");
-    constexpr int tileSize = 200;
+    constexpr int tileSize = 16;
     int nTileX = std::ceil((float)film.getWidth() / tileSize),
         nTileY = std::ceil((float)film.getHeight() / tileSize);
     int spp = m_pixel_sampler->getSpp();
+    auto camera = m_scene->getCamera();
     // rendering full resolution, crop afterwards
     auto renderFunc = [&](const blocked_range2d<int>& r) {
         for (int y_ = r.rows().begin(); y_ < r.rows().end(); y_++) {
@@ -62,9 +63,10 @@ void RayTracer::render(Film& film) {
                         // generate one sampler for each pixel
                         for (int i = 0; i < spp; i++) {
                             Vec2f uv = sampler->getSamplePosition(i);
-                            Ray ray = generateRay(
+                            Ray ray = camera->generateRealisticRay(
                                 Vec2f((x + uv.x()) / film.getWidth(),
-                                      (y + uv.y()) / film.getHeight()));
+                                      (y + uv.y()) / film.getHeight()),
+                                sampler->get2D());
                             film.setSample(
                                 x, y, i, uv,
                                 m_integrator->L(*m_scene, *sampler, ray));

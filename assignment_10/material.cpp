@@ -106,6 +106,23 @@ Vec3f Checkerboard::Shade(const Ray &ray, const Hit &hit,
         return material2->Shade(ray, hit, dirToLight, lightColor);
     }
 }
+
+std::unique_ptr<BRDF> Checkerboard::getBRDF(const Hit &hit) const {
+    Vec3f pTS = hit.getIntersectionPoint();
+    matrix->Transform(pTS);
+    // FIXME: dirty trick to ignore y axis
+    int x = (int)std::floor(pTS.x()), y = (int)std::floor(pTS.y()),
+        z = (int)std::floor(pTS.z());
+    auto pbrmat1 = dynamic_cast<PBRMaterial *>(material1),
+         pbrmat2 = dynamic_cast<PBRMaterial *>(material2);
+    assert(pbrmat1 != nullptr && pbrmat2 != nullptr);
+    if ((x + z) % 2 == 0) {
+        return pbrmat1->getBRDF(hit);
+    } else {
+        return pbrmat2->getBRDF(hit);
+    }
+}
+
 Vec3f Checkerboard::ShadeAmbient(const Vec3f &pWS,
                                  const Vec3f &lightColor) const {
     Vec3f pTS = pWS;

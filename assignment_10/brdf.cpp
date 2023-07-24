@@ -57,11 +57,12 @@ static float FD90(float cosTheta, float roughness) {
 }
 
 Vec3f PrincipledBRDF::evalDiffuse(const Vec3f &wo, const Vec3f &wi) const {
-    float p = pow5(1 - cosTheta(wi));
+    float pi = pow5(1 - cosTheta(wi));
+    float po = pow5(1 - cosTheta(wo));
     Vec3f h = normalize(wo + wi);
     float cosThetaD = absDot(wi, h);
     float fd90 = FD90(cosThetaD, roughness);
-    return baseColor / M_PI * (1 + (fd90 - 1.0) * p) * (1 + (fd90 - 1.0) * p);
+    return baseColor / M_PI * (1 + (fd90 - 1.0) * pi) * (1 + (fd90 - 1.0) * po);
 }
 
 static float Fss90(float cosTheta, float roughness) {

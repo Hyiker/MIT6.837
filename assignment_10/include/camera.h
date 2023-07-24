@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT3_CAMERA_HPP
-#define ASSIGNMENT3_CAMERA_HPP
+#ifndef ASSIGNMENT_10_INCLUDE_CAMERA_HPP
+#define ASSIGNMENT_10_INCLUDE_CAMERA_HPP
 #include <limits>
 
 #include "ray.h"
@@ -8,7 +8,10 @@ class Camera {
    public:
     Camera() = default;
     virtual ~Camera() = default;
-    virtual Ray generateRay(Vec2f point) = 0;
+    virtual Ray generateRay(Vec2f point) const = 0;
+    virtual Ray generateRealisticRay(Vec2f point, const Vec2f&) const {
+        return generateRay(point);
+    }
     virtual float getTMin() const = 0;
 
     virtual void glInit(int w, int h) = 0;
@@ -33,7 +36,7 @@ class OrthographicCamera : public Camera {
         m_screenup.Normalize();
     }
     ~OrthographicCamera() override = default;
-    Ray generateRay(Vec2f point) override {
+    Ray generateRay(Vec2f point) const override {
         // center - (size*up)/2 - (size*horizontal)/2  ->
         // center + (size*up)/2 + (size*horizontal)/2
 
@@ -78,7 +81,7 @@ class PerspectiveCamera : public Camera {
         m_screenup.Normalize();
     }
     ~PerspectiveCamera() override = default;
-    Ray generateRay(Vec2f point) override {
+    virtual Ray generateRay(Vec2f point) const override {
         // remap point to [-0.5, 0.5]
         point -= Vec2f(0.5, 0.5);
 
@@ -103,7 +106,7 @@ class PerspectiveCamera : public Camera {
         std::cout << "fov: " << m_fov << std::endl;
     }
 
-   private:
+   protected:
     Vec3f m_center;
     Vec3f m_direction;
     Vec3f m_up;
@@ -112,5 +115,40 @@ class PerspectiveCamera : public Camera {
 
     float m_fov;
 };
+class RealisticCamera : public PerspectiveCamera {
+   public:
+    RealisticCamera(Vec3f center, Vec3f direction, Vec3f up, float fov,
+                    float focalLength, float aperture)
+        : PerspectiveCamera(center, direction, up, fov),
+          m_focal_length(focalLength),
+          m_aperture(aperture) {}
+    ~RealisticCamera() override = default;
+    Ray generateRealisticRay(Vec2f point, const Vec2f& u) const override {
+        Ray ray = generateRay(point);
+        Vec3f convergence =
+            ray.getOrigin() + ray.getDirection() * m_focal_length;
+        float theta = 2 * M_PI * u.x();
+        float r = m_aperture * std::sqrt(u.y());
+        Vec3f origin = ray.getOrigin() + m_horizontal * r * std::cos(theta) +
+                       m_screenup * r * std::sin(theta);
+        Vec3f direction = convergence - origin;
+        direction.Normalize();
+        return Ray(origin, direction);
+    }
 
-#endif /* ASSIGNMENT3_CAMERA_HPP */
+    void print() const override {
+        std::cout << "RealisticCamera: " << std::endl;
+        std::cout << "center: " << m_center << std::endl;
+        std::cout << "direction: " << m_direction << std::endl;
+        std::cout << "up: " << m_up << std::endl;
+        std::cout << "fov: " << m_fov << std::endl;
+        std::cout << "focal length: " << m_focal_length << std::endl;
+        std::cout << "aperture: " << m_aperture << std::endl;
+    }
+
+   private:
+    float m_focal_length;
+    float m_aperture;
+};
+
+#endif /* ASSIGNMENT_10_INCLUDE_CAMERA_HPP */

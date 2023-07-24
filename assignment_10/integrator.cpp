@@ -17,7 +17,6 @@ Vec3f sampleLight(const Scene& scene, const Ray& ray, const Hit& hit,
     Vec3f woWS = -normalize(ray.getDirection());
     Vec3f wiWS = brdf.importanceSample(woWS, sampler.get2D(), &brdfPdf);
     Vec3f n = normalize(hit.getNormal()), p = hit.getIntersectionPoint();
-
     // evaluate environment light
     Vec3f env = scene.getAmbientLight() * absDot(n, wiWS);
     if (brdfPdf > 0) {
@@ -80,7 +79,6 @@ Vec3f PathIntegrator::L(const Scene& scene, GlobalSampler& sampler,
         Vec3f woWS = -normalize(r.getDirection());
         Vec3f n = normalize(hit.getNormal());
         L += beta * sampleLight(scene, r, hit, sampler, *brdf);
-
         // sample brdf
         float pdf = 0;
         Vec3f wiWS = brdf->importanceSample(woWS, sampler.get2D(), &pdf);

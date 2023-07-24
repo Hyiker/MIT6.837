@@ -53,6 +53,7 @@ class SceneParser {
     void parseFile();
     void parseOrthographicCamera();
     void parsePerspectiveCamera();
+    void parseRealisticCamera();
     void parseBackground();
     void parseLights();
     Light* parseDirectionalLight();

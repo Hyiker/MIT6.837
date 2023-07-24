@@ -11,8 +11,8 @@ In this assignment, I'll try to introduce some modern rendering technical flavor
   - [x] BRDF Importance Sampling
 - [x] PBR materials
   - [x] Disney Principled BRDF(simpified, without clearcoat and sheen)
-- [ ] Realistic camera
-  - [ ] Depth of Field
+- [x] Realistic camera
+  - [x] Depth of Field
 - [x] Parallel rendering(using [oneTBB](https://github.com/oneapi-src/oneTBB))
 
 ## Showcase
