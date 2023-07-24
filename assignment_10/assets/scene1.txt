@@ -34,7 +34,7 @@ Materials {
         roughness 0.4
     }
     UberMaterial {
-        baseColor 1.0 1.0 1.0
+        baseColor 0.8 0.8 0.8
         subsurface 0.0
         metallic 1.0
         specular 1.0

@@ -1,7 +1,12 @@
+add_requires("stb")
+
 target("common")
     set_kind("static")
     add_files("**.cpp")
     add_includedirs("includes", {public = true})
+    add_packages("stb")
+
+
     set_languages("cxx20")
     add_defines("_CRT_SECURE_NO_WARNINGS")
     set_policy("build.warning", true)

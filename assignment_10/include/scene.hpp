@@ -1,5 +1,5 @@
-#ifndef ASSIGNMENT10_INCLUDE_SCENE_HPP
-#define ASSIGNMENT10_INCLUDE_SCENE_HPP
+#ifndef ASSIGNMENT_10_INCLUDE_SCENE_HPP
+#define ASSIGNMENT_10_INCLUDE_SCENE_HPP
 #include "grid.h"
 #include "scene_parser.h"
 class Scene {
@@ -19,10 +19,11 @@ class Scene {
     auto getBackgroundColor() const {
         return m_scene_parser->getBackgroundColor();
     }
+    auto getEmitters() const { return m_scene_parser->getEmitters(); }
 
    private:
     SceneParser* m_scene_parser;
     Grid* m_grid;
 };
 
-#endif /* ASSIGNMENT10_INCLUDE_SCENE_HPP */
+#endif /* ASSIGNMENT_10_INCLUDE_SCENE_HPP */

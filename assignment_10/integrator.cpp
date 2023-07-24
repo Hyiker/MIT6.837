@@ -16,7 +16,7 @@ Vec3f sampleLight(const Scene& scene, const Ray& ray, const Hit& hit,
     float brdfPdf = 0;
     Vec3f woWS = -normalize(ray.getDirection());
     Vec3f wiWS = brdf.importanceSample(woWS, sampler.get2D(), &brdfPdf);
-    Vec3f n = normalize(hit.getNormal());
+    Vec3f n = normalize(hit.getNormal()), p = hit.getIntersectionPoint();
 
     // evaluate environment light
     Vec3f env = scene.getAmbientLight() * absDot(n, wiWS);
@@ -30,26 +30,25 @@ Vec3f sampleLight(const Scene& scene, const Ray& ray, const Hit& hit,
             L += f * env / brdfPdf;
         }
     }
-
-    // evaluate directional light
-    // they are dirac delta function, so no need to sample
-    // https://computergraphics.stackexchange.com/questions/12455/how-are-point-and-pure-directional-lights-sampled-in-an-unbiased-path-tracer
-    for (int i = 0; i < scene.getNumLights(); i++) {
-        Light* light = scene.getLight(i);
-
+    for (auto emitter : scene.getEmitters()) {
         Vec3f wiWS;
         Vec3f illum(0, 0, 0);
-        float d = INFINITY;
-        light->getIllumination(hit.getIntersectionPoint(), wiWS, illum, d);
+        DirectSamplingRecord record;
+        float lightPdf = 0;
+        illum = emitter->sampleLi(p, &lightPdf, &record);
+        if (lightPdf == 0 || illum.Length() == 0) {
+            continue;
+        }
+        wiWS = normalize(record.point - p);
         // visibility test
         Ray shadowRay = Ray(hit.getIntersectionPoint() + n * 1e-4, wiWS);
         Hit hit;
-        bool occluded = scene.intersect(shadowRay, hit, 0);
-        if (occluded) {
+        bool intersected = scene.intersect(shadowRay, hit, 0);
+        if (intersected && record.isOccluded(hit.getT())) {
             continue;
         }
-        Vec3f f = brdf.eval(-ray.getDirection(), wiWS);
-        L += f * illum * absDot(n, wiWS);
+        Vec3f f = brdf.eval(woWS, wiWS);
+        L += f * illum * absDot(n, wiWS) / lightPdf;
     }
 
     return L;

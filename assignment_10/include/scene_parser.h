@@ -3,10 +3,13 @@
 
 #include <assert.h>
 
+#include <vector>
+
 #include "vectors.h"
 
 class Camera;
 class Light;
+class PBREmitter;
 class Material;
 class Object3D;
 class Group;
@@ -41,6 +44,7 @@ class SceneParser {
         return materials[i];
     }
     Group* getGroup() const { return group; }
+    auto getEmitters() const { return emitters; }
 
    private:
     SceneParser() { assert(0); }  // don't use
@@ -85,6 +89,7 @@ class SceneParser {
     Vec3f ambient_light;
     int num_lights;
     Light** lights;
+    std::vector<PBREmitter*> emitters;
     int num_materials;
     Material** materials;
     Material* current_material;

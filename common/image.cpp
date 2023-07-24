@@ -1,5 +1,6 @@
 #include "image.h"
-
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb/stb_image_write.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -182,6 +183,17 @@ Image *Image::LoadPPM(const char *filename) {
     }
     fclose(file);
     return answer;
+}
+
+void Image::SaveEXR(const char *filename) const {
+    assert(filename != NULL);
+    // must end in .exr
+    const char *ext = &filename[strlen(filename) - 4];
+    assert(!strcmp(ext, ".exr"));
+    // flip y so that (0,0) is bottom left corner
+    stbi_flip_vertically_on_write(true);
+    // save the flipped image
+    stbi_write_hdr(filename, width, height, 3, (float *)data);
 }
 
 // ====================================================================

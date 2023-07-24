@@ -49,6 +49,7 @@ class Image {
     void SavePPM(const char *filename) const;
     static Image *LoadTGA(const char *filename);
     void SaveTGA(const char *filename) const;
+    void SaveEXR(const char *filename) const;
 
     // extension for image comparison
     static Image *Compare(Image *img1, Image *img2);

@@ -1,12 +1,14 @@
-#ifndef _LIGHT_H_
-#define _LIGHT_H_
+#ifndef ASSIGNMENT_10_INCLUDE_LIGHT_HPP
+#define ASSIGNMENT_10_INCLUDE_LIGHT_HPP
 
 #include "object3d.h"
 #include "vectors.h"
 
 // ====================================================================
 // ====================================================================
-
+class Light;
+class PBREmitter;
+struct DirectSamplingRecord;
 class Light {
    public:
     // CONSTRUCTOR & DESTRUCTOR
@@ -20,6 +22,36 @@ class Light {
     virtual void glInit(int id) = 0;
 };
 
+struct DirectSamplingRecord {
+    // surface ref point
+    Vec3f ref;
+    // light sampling result point
+    Vec3f point;
+    const PBREmitter *emitter;
+
+    bool isOccluded(float tShadowRay) const {
+        return (point - ref).Length() > tShadowRay;
+    }
+};
+
+class PBREmitter {
+   public:
+    PBREmitter() {}
+    virtual ~PBREmitter() {}
+    // accept the surface point, returning wi, pdf, and radiance
+    virtual Vec3f sampleLi(const Vec3f &p, float *pdf,
+                           DirectSamplingRecord *record) const {
+        return Vec3f(0, 0, 0);
+    }
+    virtual float pdfLi(const DirectSamplingRecord &record) const { return 0; }
+    // virtual Vec3f getRadiance() const = 0;
+    // virtual Vec3f getRadiance(const Vec3f &p, const Vec3f &n,
+    //                           const Vec3f &w) const = 0;
+    // virtual Vec3f sample(const Vec3f &p, const Vec3f &n, Vec3f &wi,
+    //                      float &pdf) const = 0;
+    // virtual float pdf(const Vec3f &p, const Vec3f &n,
+    //                   const Vec3f &wi) const = 0;
+};
 // ====================================================================
 // ====================================================================
 
@@ -101,4 +133,4 @@ class PointLight : public Light {
 // ====================================================================
 // ====================================================================
 
-#endif
+#endif /* ASSIGNMENT_10_INCLUDE_LIGHT_HPP */

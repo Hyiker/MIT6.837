@@ -8,12 +8,19 @@ In this assignment, I'll try to introduce some modern rendering technical flavor
 
 - [x] Path tracing
   - [x] NEE(Next Event Estimation)
-  - [ ] BRDF Importance Sampling
+  - [x] BRDF Importance Sampling
 - [x] PBR materials
-  - [x] (Disney Principled BRDF)
+  - [x] Disney Principled BRDF(simpified, without clearcoat and sheen)
+- [ ] Realistic camera
+  - [ ] Depth of Field
 - [x] Parallel rendering(using [oneTBB](https://github.com/oneapi-src/oneTBB))
 
 ## Showcase
 
 ![scene1](./imgs/scene1.png)
-perfect mirror sphere and glossy bunny(512 SPP)
+perfect mirror sphere and glossy bunny
+
+## References
+
+- [Physically Based Rendering: From Theory to Implementation](http://www.pbr-book.org/)
+- [Disney Principled BRDF实现笔记](https://airguanz.github.io/2019/02/20/disney-brdf.html)

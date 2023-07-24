@@ -42,7 +42,7 @@ void PrincipledBRDF::sample(const Vec3f &wo, Vec2f u, Vec3f *wi,
         *pdf = 0;
         return;
     }
-    *pdf = DsPdf(h, *wi);
+    *pdf = this->pdf(wo, *wi);
 }
 
 float PrincipledBRDF::pdf(const Vec3f &wo, const Vec3f &wi) const {

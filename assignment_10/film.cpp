@@ -91,5 +91,5 @@ void Film::saveImage(const char *filename) {
     }
 
     // save the image
-    image.SaveTGA(filename);
+    image.SaveEXR(filename);
 }
